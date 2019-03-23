@@ -5,6 +5,7 @@
 #include <sys/wait.h>
 #include <unistd.h>
 #include <time.h>
+#include "prime.h"
 
 // Size of each message.
 #define MSGSIZE 20
@@ -15,7 +16,7 @@ int main(int argc, char *argv[]){
     int fd[2];
     
     // Starting number.
-    int n = 1;
+    int number = 1;
     
     // New seed for rand().
     srand(time(NULL));
@@ -43,29 +44,43 @@ int main(int argc, char *argv[]){
 
     // Father process: fork > 0
     else if (f > 0){
-        
         // Impede-se a leitura.
         close(fd[0]);
-        char str_n[MSGSIZE];
+        char write_n[MSGSIZE];
         
         for (int i = 0; i < how_many; i++){
-            n += delta;
-            sprintf(str_n, "%d", n);
-            write(fd[1], str_n, MSGSIZE);
+            number += delta;
+            sprintf(write_n, "%d", number);
+            write(fd[1], write_n, MSGSIZE);
         }
+
+        write(fd[1], "0", MSGSIZE);
         close(fd[1]);
         exit(0);
     }
 
     // Child process: fork == 0
     else{
+        // Impede-se a escrita.
         close(fd[1]);
         
         char read_n[MSGSIZE];
-        while(read(fd[0], read_n, MSGSIZE)){
-            printf("%s\n", read_n);
+        read(fd[0], read_n, MSGSIZE);
+        int out = atoi(read_n);
+
+        while (out){
+            printf("Is number %d prime?\n", out);
+
+            if (prime(out)) printf("Yes.\n\n");
+            else printf("No.\n\n");
+
+            read(fd[0], read_n, MSGSIZE);
+            out = atoi(read_n);
         }
+
+        printf("SIGTERM\n\n");
         close(fd[0]);
         exit(0);
     }
+    return 0;
 }
