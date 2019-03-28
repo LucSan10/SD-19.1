@@ -10,13 +10,10 @@
 // Size of each message.
 #define MSGSIZE 20
 
-int pipeC(int how_many){
+int pipe_creator(int how_many){
 
     // Array for pipe read/write.
     int fd[2];
-    
-    // Starting number.
-    int number = 1;
     
     // New seed for rand().
     srand(time(NULL));
@@ -38,42 +35,13 @@ int pipeC(int how_many){
 
     // Father process: fork > 0
     else if (f > 0){
-        // Impede-se a leitura.
-        close(fd[0]);
-        char write_n[MSGSIZE];
-        
-        for (int i = 0; i < how_many; i++){
-            number += rand() % 100;
-            sprintf(write_n, "%d", number);
-            write(fd[1], write_n, MSGSIZE);
-        }
-
-        write(fd[1], "0", MSGSIZE);
-        close(fd[1]);
+        father(fd, how_many);
         exit(EXIT_SUCCESS);
     }
 
     // Child process: fork == 0
     else{
-        // Impede-se a escrita.
-        close(fd[1]);
-        
-        char read_n[MSGSIZE];
-        read(fd[0], read_n, MSGSIZE);
-        int out = atoi(read_n);
-
-        while (out){
-            printf("Is number %d prime?\n", out);
-
-            if (prime(out)) printf("Yes.\n\n");
-            else printf("No.\n\n");
-
-            read(fd[0], read_n, MSGSIZE);
-            out = atoi(read_n);
-        }
-
-        printf("SIGTERM\n\n");
-        close(fd[0]);
+        child(fd);
         exit(EXIT_SUCCESS);
     }
     return 0;
@@ -88,6 +56,6 @@ int main(int argc, char* argv[]){
 
     int n = atoi(argv[1]);
 
-    pipeC(n);
+    pipe_creator(n);
     return 0;
 }
