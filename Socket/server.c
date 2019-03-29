@@ -61,19 +61,24 @@ int main(int argc, char* argv[]){
         exit(EXIT_FAILURE);
     }
 
+    
     read(client_fd, read_n, MSGSIZE);
     int out = atoi(read_n);
 
+    // Until the server receives a 0, do:
     while (out){
         printf("\nIs number %d prime?\n", out);
 
+        // Send result of the current number's primality check to the client.
         if (prime(out)) send(client_fd, "1", MSGSIZE, 0);
         else send(client_fd, "0", MSGSIZE, 0);
 
+        // Read the next number
         read(client_fd, read_n, MSGSIZE);
         out = atoi(read_n);
     }
 
+    // Erase the server socket
     shutdown(server_fd, 2);
     printf("\nSERVER SIGTERM\n");
 

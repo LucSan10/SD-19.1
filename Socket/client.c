@@ -62,6 +62,8 @@ int main(int argc, char* argv[]){
     }
 
     send(client_fd, "0", MSGSIZE, 0);
+
+    // Erase client socket
     shutdown(client_fd, 2);
     printf("\nCLIENT SIGTERM\n");
 
