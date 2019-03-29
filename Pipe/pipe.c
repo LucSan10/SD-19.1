@@ -6,6 +6,7 @@
 #include <unistd.h>
 #include <time.h>
 #include "pipeFunctions.h"
+#include "../prime.h"
 
 // Size of each message.
 #define MSGSIZE 20
@@ -48,7 +49,7 @@ int pipe_creator(int how_many){
 }
 
 int main(int argc, char* argv[]){
-    
+
     if (argc < 2){
         fprintf(stderr, "Input number not specified.\n");
         exit(EXIT_FAILURE);
