@@ -22,6 +22,7 @@ void myHandlerIll (int param)
 void myHandlerTerm (int param)
 {
     printf("handler Term \n");
+    exit(0);
 }
 
 void startBusyWait(){
