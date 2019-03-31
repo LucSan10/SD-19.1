@@ -38,7 +38,7 @@ int main(int argc, char *argv[]){
     termHandler = signal (SIGTERM, myHandlerTerm);
 
     if(argc < 2){
-        printf("Missing parameter for time of wait \n");
+        printf("Missing parameter for type of wait \n");
         return 0;
     } else if (atoi(argv[1])==0){
         startBusyWait();
