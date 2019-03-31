@@ -6,16 +6,19 @@
 #include <unistd.h>
 #include <time.h>
 
+// SIGINT = 2
 void myHandlerInt (int param)
 {
     printf("handler Int \n");
 }
 
+// SIGILL = 4
 void myHandlerIll (int param)
 {
     printf("handler Ill \n");
 }
 
+// SIGTERM = 15
 void myHandlerTerm (int param)
 {
     printf("handler Term \n");
