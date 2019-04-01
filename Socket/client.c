@@ -50,6 +50,11 @@ int main(int argc, char* argv[]){
     srand(time(NULL));
     int how_many = atoi(argv[1]);
 
+    if (how_many < 0){
+        fprintf(stderr, "Input number cannot be negative.\n");
+        exit(EXIT_FAILURE);
+    }
+
     for (int i = 0; i < how_many; i++){
         number += rand() % 100;
         sprintf(write_n, "%d", number);
