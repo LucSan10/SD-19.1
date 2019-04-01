@@ -27,9 +27,13 @@ void myHandlerTerm (int param)
 
 void startBusyWait(){
     printf("starting busy wait \n");
-    while (1){
+    while (1);
+}
+
+void startBlockWait(){
+    printf("starting blocking wait \n");
+    while (1)
         pause();
-    }
 }
 
 int main(int argc, char *argv[]){
@@ -49,7 +53,7 @@ int main(int argc, char *argv[]){
     } else if (atoi(argv[1])==0){
         startBusyWait();
     } else {
-        
+        startBlockWait();
     }
 
     return 0;
