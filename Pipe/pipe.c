@@ -55,6 +55,11 @@ int main(int argc, char* argv[]){
         exit(EXIT_FAILURE);
     }
 
+    if (argv[1] < 0){
+        fprintf(stderr, "Input number cannot be negative.\n");
+        exit(EXIT_FAILURE);
+    }
+
     int n = atoi(argv[1]);
 
     pipe_creator(n);
