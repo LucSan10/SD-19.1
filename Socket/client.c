@@ -57,7 +57,9 @@ int main(int argc, char* argv[]){
 
     for (int i = 0; i < how_many; i++){
         number += rand() % 100;
+        printf("\nIs number %d prime?\n", number);
         sprintf(write_n, "%d", number);
+        
         send(client_fd, write_n, MSGSIZE, 0);
 
         read(client_fd, read_n, MSGSIZE);

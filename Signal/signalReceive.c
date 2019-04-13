@@ -37,7 +37,7 @@ void startBlockWait(){
 }
 
 int main(int argc, char *argv[]){
-    printf("Process id: %d\n", ::getpid());
+    printf("Process id: %d\n", getpid());
 
     void (*intHandler)(int);
     void (*illHandler)(int);

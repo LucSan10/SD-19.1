@@ -67,8 +67,6 @@ int main(int argc, char* argv[]){
 
     // Until the server receives a 0, do:
     while (out){
-        printf("\nIs number %d prime?\n", out);
-
         // Send result of the current number's primality check to the client.
         if (prime(out)) send(client_fd, "1", MSGSIZE, 0);
         else send(client_fd, "0", MSGSIZE, 0);
