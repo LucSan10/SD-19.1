@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <stdatomic.h>
 #include <time.h>
+#define MIN_VALUE -100
+#define MAX_VALUE 100
 
 atomic_flag held = ATOMIC_FLAG_INIT;
 
@@ -13,8 +15,14 @@ void release(volatile atomic_flag* lock){
     atomic_flag_clear(lock);
 }
 
-int generate_random_value(int start, int end){
-    return rand() % (end - start) + start;
+int generate_random_value(int minVal, int maxVal){
+    return rand() % (maxVal - minVal) + minVal;
+}
+
+void populateArrayRandomly(int* arr, int N, int minVal, int maxVal){
+    for(int i = 0; i < N; i++){
+        arr[i] = generate_random_value(minVal, maxVal);
+    }
 }
 
 int main(int argc, char* argv[]){
@@ -33,4 +41,7 @@ int main(int argc, char* argv[]){
 
     int N = atoi(argv[1]);
     int K = atoi(argv[2]);
+
+    int* arr = (int*) calloc(N, 1);
+    populateArrayRandomly(arr, N, MIN_VALUE, MAX_VALUE);
 }
