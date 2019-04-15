@@ -17,13 +17,13 @@ void release(volatile atomic_flag* lock){
 }
 
 int8_t generate_random_value(int minVal, int maxVal){
-    return rand() % (maxVal - minVal) + minVal;
+    int8_t value = (int8_t) rand() % (maxVal - minVal) + minVal;
+    return value;
 }
 
 void populateArrayRandomly(int8_t* arr, int N, int minVal, int maxVal){
-    for(int i = 0; i < N; i++){
-        arr[i] = (int8_t) generate_random_value(minVal, maxVal);
-    }
+    for(int i = 0; i < N; i++) arr[i] = generate_random_value(minVal, maxVal);
+
 }
 
 int main(int argc, char* argv[]){
