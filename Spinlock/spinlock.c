@@ -96,9 +96,11 @@ int main(int argc, char* argv[]){
         );
     }
 
+    // time-start
     for(int i = 0; i < K; i++){
         pthread_join(thread_ids[i], NULL);
     }
+    // time-end
 
-    printf("\nTotal sum: %d", accumulator);
+    printf("\nTotal sum: %d\n", accumulator);
 }
