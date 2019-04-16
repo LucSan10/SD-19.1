@@ -12,7 +12,10 @@ typedef struct{
     int end;
 } Interval;
 
-atomic_flag held = ATOMIC_FLAG_INIT;
+int accumulator;
+int8_t* arr;
+
+atomic_flag* lock = ATOMIC_FLAG_INIT;
 
 void acquire(volatile atomic_flag* lock){
     while(atomic_flag_test_and_set(lock));
@@ -34,24 +37,32 @@ void populate_interval(Interval* interval, int N, int K){
     int i = 0;
     while(i < N){
         interval->start = i;
-        i += (rest > 0) + numbers_per_thread;
+        if (rest > 0){
+            i++;
+            rest--;
+        }
+        i += numbers_per_thread;
         interval->end = i;
         interval++;
-        rest--;
     }
 }
 
 void* thread_execute_sum(void* args){
-    /*for(int i = 0; i < ; i++){
-    
-    }*/
-    int* input_values = args;
-    printf("start: %d; end: %d\n", input_values[0]+1, input_values[1]);
+    Interval* interval = args;
+    for (int i = interval->start; i < interval->end; i++){
+        printf("%d\n", i);
+        acquire(lock);
+        accumulator += arr[i];
+        release(lock);
+        printf("hey");
+    }
 }
 
 int main(int argc, char* argv[]){
     // New seed for rand().
     srand(time(NULL));
+
+    accumulator = 0;
 
     if (argc < 2){
         fprintf(stderr, "Input array size missing.\n");
@@ -69,7 +80,7 @@ int main(int argc, char* argv[]){
     Interval* interval = (Interval*) calloc(K,sizeof(Interval));
     populate_interval(interval, N, K);
 
-    int8_t* arr = (int8_t*) calloc(N, 1);
+    arr = (int8_t*) calloc(N, 1);
     populate_array_randomly(arr, N, MIN_VALUE, MAX_VALUE);
 
     pthread_t thread_ids[K];
@@ -82,6 +93,11 @@ int main(int argc, char* argv[]){
             thread_execute_sum,
             &interval[i]
         );
+    }
+
+    for(int i = 0; i < K; i++){
         pthread_join(thread_ids[i], NULL);
     }
+
+    printf("\nTotal sum: %d", accumulator);
 }
