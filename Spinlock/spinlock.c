@@ -52,8 +52,9 @@ void* thread_execute_sum(void* args){
     int temp = 0;
     
     for (int i = interval->start; i < interval->end; i++){
-        temp += arr[i];
+        temp += (int) arr[i];
     }
+    
     acquire(&lock);
     accumulator += temp;
     release(&lock);
@@ -84,6 +85,11 @@ int main(int argc, char* argv[]){
     arr = (int8_t*) calloc(N, 1);
     populate_array_randomly(arr, N, MIN_VALUE, MAX_VALUE);
 
+    // measure time
+    clock_t start, end;
+    double cpu_time_used;
+    start = clock();
+
     pthread_t thread_ids[K];
 
     for(int i = 0; i < K; i++){
@@ -96,11 +102,14 @@ int main(int argc, char* argv[]){
         );
     }
 
-    // time-start
     for(int i = 0; i < K; i++){
         pthread_join(thread_ids[i], NULL);
     }
+
     // time-end
+    end = clock();
+    cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
 
     printf("\nTotal sum: %d\n", accumulator);
+    printf("Time taken to execute: %f s\n", cpu_time_used);
 }
