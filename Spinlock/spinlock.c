@@ -49,11 +49,14 @@ void calculate_intervals(Interval* interval, int N, int K){
 
 void* thread_execute_sum(void* args){
     Interval* interval = args;
+    int temp = 0;
+    
     for (int i = interval->start; i < interval->end; i++){
-        acquire(&lock);
-        accumulator += arr[i];
-        release(&lock);
+        temp += arr[i];
     }
+    acquire(&lock);
+    accumulator += temp;
+    release(&lock);
 }
 
 int main(int argc, char* argv[]){
