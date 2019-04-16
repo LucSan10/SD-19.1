@@ -27,7 +27,7 @@ void release(volatile atomic_flag* lock){
 
 void populate_array_randomly(int8_t* arr, int N, int min_val, int max_val){
     for(int i = 0; i < N; i++){
-        arr[i] = (int8_t) min_val + (rand() % (max_val - min_val));
+        arr[i] = (int8_t) min_val + (rand() % (max_val + 1 - min_val));
     }
 }
 
@@ -110,6 +110,14 @@ int main(int argc, char* argv[]){
     end = clock();
     cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
 
-    printf("\nTotal sum: %d\n", accumulator);
+    printf("\nK, N = %d, %d\n", K, N);
+    
+    // printf("[");
+    // for (int i = 0; i < N-1; i++){
+    //     printf("%d, ", arr[i]);
+    // }
+    // printf("%d]", arr[N-1]);
+
+    printf("Total sum: %d\n", accumulator);
     printf("Time taken to execute: %f s\n", cpu_time_used);
 }
