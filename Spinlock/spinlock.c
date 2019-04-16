@@ -31,7 +31,7 @@ void populate_array_randomly(int8_t* arr, int N, int min_val, int max_val){
     }
 }
 
-void populate_interval(Interval* interval, int N, int K){
+void calculate_intervals(Interval* interval, int N, int K){
     int numbers_per_thread = N/K;
     int rest = N%K;
     int i = 0;
@@ -76,7 +76,7 @@ int main(int argc, char* argv[]){
     int K = atoi(argv[2]);
 
     Interval* interval = (Interval*) calloc(K,sizeof(Interval));
-    populate_interval(interval, N, K);
+    calculate_intervals(interval, N, K);
 
     arr = (int8_t*) calloc(N, 1);
     populate_array_randomly(arr, N, MIN_VALUE, MAX_VALUE);
