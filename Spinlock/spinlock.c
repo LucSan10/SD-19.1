@@ -15,7 +15,7 @@ typedef struct{
 int accumulator;
 int8_t* arr;
 
-atomic_flag* lock = ATOMIC_FLAG_INIT;
+atomic_flag lock = ATOMIC_FLAG_INIT;
 
 void acquire(volatile atomic_flag* lock){
     while(atomic_flag_test_and_set(lock));
@@ -35,7 +35,7 @@ void populate_interval(Interval* interval, int N, int K){
     int numbers_per_thread = N/K;
     int rest = N%K;
     int i = 0;
-    while(i < N){
+    while(i <= N){
         interval->start = i;
         if (rest > 0){
             i++;
@@ -50,11 +50,9 @@ void populate_interval(Interval* interval, int N, int K){
 void* thread_execute_sum(void* args){
     Interval* interval = args;
     for (int i = interval->start; i < interval->end; i++){
-        printf("%d\n", i);
-        acquire(lock);
+        acquire(&lock);
         accumulator += arr[i];
-        release(lock);
-        printf("hey");
+        release(&lock);
     }
 }
 
