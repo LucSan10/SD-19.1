@@ -26,8 +26,10 @@ void release(volatile atomic_flag* lock){
 }
 
 void populate_array_randomly(int8_t* arr, int N, int min_val, int max_val){
+    int interval = max_val-min_val+1;
     for(int i = 0; i < N; i++){
-        arr[i] = (int8_t) min_val + (rand() % (max_val + 1 - min_val));
+        double uniform = ((double) rand())/RAND_MAX;
+        arr[i] = (int8_t) min_val + (int8_t) (uniform * interval);
     }
 }
 

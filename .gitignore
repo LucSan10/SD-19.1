@@ -1,6 +1,6 @@
 .vscode/*
-Pipe/pipe
-Signal/signalReceive
-Signal/signalSend
-Socket/client
-Socket/server
+Assignment_1/Pipe/pipe
+Assignment_1/Signal/signalReceive
+Assignment_1/Signal/signalSend
+Assignment_1/Socket/client
+Assignment_1/Socket/server
