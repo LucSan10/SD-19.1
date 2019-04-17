@@ -20,8 +20,8 @@ typedef struct{
 } Circular_FIFO;
 
 typedef struct{
-    int not_full;
-    int not_empty;
+    int empty_buffers;
+    int full_buffers;
     int mutex;
 } Semaphores;
 
@@ -29,7 +29,8 @@ static Circular_FIFO* fifo;
 
 static Semaphores* semaphores;
 
-static int* iteration_limit;
+int* producer_count;
+int* consumer_count;
 
 int random_number_generator(int min_val, int max_val){
     int interval = max_val-min_val+1;
@@ -48,28 +49,28 @@ void signal(int* semaphore){
 }
 
 void* producer_thread(void* args){
-    while(*iteration_limit > 0){
+    while(*producer_count < ITERATION_LIMIT){
         int write = random_number_generator(MIN_VALUE, MAX_VALUE);
 
-        wait(&semaphores->not_full);
+        wait(&semaphores->empty_buffers);
         wait(&semaphores->mutex);
         FIFO_write(write);
+        (*producer_count)++;
         signal(&semaphores->mutex);
-        signal(&semaphores->not_empty);
+        signal(&semaphores->full_buffers);
         
         printf("Next value: %d\n", write);
     }
 }
 
 void* consumer_thread(void* args){
-    while(*iteration_limit > 0){
-        wait(&semaphores->not_empty);
+    while(*consumer_count < ITERATION_LIMIT){
+        wait(&semaphores->full_buffers);
         wait(&semaphores->mutex);
         int x = FIFO_read();
+        (*consumer_count)++;
         signal(&semaphores->mutex);
-        signal(&semaphores->not_full);
-        
-        (*iteration_limit)--;
+        signal(&semaphores->empty_buffers);
         
         if (!prime(x)) printf("The number %d is not prime\n", x);
         else printf("The number %d is prime\n", x);
@@ -91,11 +92,12 @@ void FIFO_write(int number_to_write){
 int main(int argc, char* argv[]){
     fifo = (Circular_FIFO*) calloc(1, sizeof(Circular_FIFO));
     semaphores = (Semaphores*) calloc(1, sizeof(Semaphores));
-    iteration_limit = (int*) malloc(sizeof(int));
+    producer_count = (int*) calloc(1, sizeof(int));
+    consumer_count = (int*) calloc(1, sizeof(int));
 
     srand(time(NULL));
 
-    semaphores->not_empty = 0;
+    semaphores->full_buffers = 0;
     semaphores->mutex = 1;
 
     if (argc < 2){
@@ -116,9 +118,8 @@ int main(int argc, char* argv[]){
     int array_size = atoi(argv[1]);
     int producer_K = atoi(argv[2]);
     int consumer_K = atoi(argv[3]);
-    *iteration_limit = ITERATION_LIMIT;
 
-    semaphores->not_full = array_size;
+    semaphores->empty_buffers = array_size;
 
     fifo->array = (int*) calloc(array_size, sizeof(int));
     fifo->start = -1;
@@ -151,15 +152,15 @@ int main(int argc, char* argv[]){
         );
     }
 
-    // for (int i = 0; i < consumer_K; i++){
-    //     pthread_join(consumer_thread_ids[i], NULL);
-    // }
+    for (int i = 0; i < consumer_K; i++){
+        pthread_join(consumer_thread_ids[i], NULL);
+    }
 
     printf("Consumer threads joined.\n");
 
-    // for (int i = 0; i < producer_K; i++){
-    //     pthread_join(producer_thread_ids[i], NULL);
-    // }
+    for (int i = 0; i < producer_K; i++){
+        pthread_join(producer_thread_ids[i], NULL);
+    }
 
     printf("Producer threads joined.\n");
 
