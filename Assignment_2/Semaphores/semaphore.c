@@ -8,8 +8,8 @@
 #include "../prime.h"
 
 #define MIN_VALUE 1
-#define MAX_VALUE 100
-#define ITERATION_LIMIT 10
+#define MAX_VALUE 10000000
+#define ITERATION_LIMIT 100000
 
 typedef struct{
     int* array;
@@ -69,7 +69,6 @@ void* producer_thread(void* args){
 
         sem_wait(semaphores->empty_buffers);
         sem_wait(semaphores->mutex);
-        printf("Next value: %d\n", write);
         FIFO_write(write);
         sem_post(semaphores->mutex);
         sem_post(semaphores->full_buffers);
@@ -172,17 +171,13 @@ int main(int argc, char* argv[]){
         );
     }
 
-    for (int i = 0; i < consumer_K; i++){
-        pthread_join(consumer_thread_ids[i], NULL);
-    }
-
-    printf("Consumer threads joined.\n");
-
     for (int i = 0; i < producer_K; i++){
         pthread_join(producer_thread_ids[i], NULL);
     }
 
-    printf("Producer threads joined.\n");
+    for (int i = 0; i < consumer_K; i++){
+        pthread_join(consumer_thread_ids[i], NULL);
+    }
 
     // time-end
     end = clock();
