@@ -11,7 +11,7 @@
 
 #define MIN_VALUE 1
 #define MAX_VALUE 100
-#define ITERATION_LIMIT 1000
+#define ITERATION_LIMIT 10
 
 typedef struct{
     int* array;
@@ -40,27 +40,45 @@ int random_number_generator(int min_val, int max_val){
     return min_val + (int) (uniform * interval);
 }
 
+int check_iteration(int* iter){
+    (*iter)++;
+    return (*iter > ITERATION_LIMIT);
+}
+
 void* producer_thread(void* args){
-    while(*producer_count < ITERATION_LIMIT){
+    int check;
+    
+    while(1){
+        sem_wait(semaphores->mutex);
+        check = (check_iteration(producer_count));
+        sem_post(semaphores->mutex);
+
+        if (check) break;
+
         int write = random_number_generator(MIN_VALUE, MAX_VALUE);
 
         sem_wait(semaphores->empty_buffers);
         sem_wait(semaphores->mutex);
+        printf("Next value: %d\n", write);
         FIFO_write(write);
-        (*producer_count)++;
         sem_post(semaphores->mutex);
         sem_post(semaphores->full_buffers);
-        
-        printf("Next value: %d\n", write);
     }
 }
 
 void* consumer_thread(void* args){
-    while(*consumer_count < ITERATION_LIMIT){
+    int check;
+    
+    while(1){
+        sem_wait(semaphores->mutex);
+        check = (check_iteration(consumer_count));
+        sem_post(semaphores->mutex);
+
+        if (check) break;
+
         sem_wait(semaphores->full_buffers);
         sem_wait(semaphores->mutex);
         int x = FIFO_read();
-        (*consumer_count)++;
         sem_post(semaphores->mutex);
         sem_post(semaphores->empty_buffers);
         
