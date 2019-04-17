@@ -4,10 +4,8 @@
 #include <time.h>
 #include <stdint.h>
 #include <pthread.h>
-#include "../prime.h"
-#include "fifo.h"
-#include "semaphoreFunctions.h"
 #include <semaphore.h>
+#include "../prime.h"
 
 #define MIN_VALUE 1
 #define MAX_VALUE 100
@@ -26,9 +24,9 @@ typedef struct{
     sem_t* mutex;
 } Semaphores;
 
-static Circular_FIFO* fifo;
+Circular_FIFO* fifo;
 
-static Semaphores* semaphores;
+Semaphores* semaphores;
 
 int* producer_count;
 int* consumer_count;
