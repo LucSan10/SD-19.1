@@ -43,6 +43,18 @@ int check_iteration(int* iter){
     return (*iter > ITERATION_LIMIT);
 }
 
+int FIFO_read(){
+    fifo->start = (fifo->start + 1) % fifo->size;
+    int number_to_read = fifo->array[fifo->start];
+    fifo->array[fifo->start] = 0;
+    return number_to_read;
+}
+
+void FIFO_write(int number_to_write){
+    fifo->end = (fifo->end + 1) % fifo->size;
+    fifo->array[fifo->end] = number_to_write;
+}
+
 void* producer_thread(void* args){
     int check;
     
@@ -83,18 +95,6 @@ void* consumer_thread(void* args){
         if (!prime(x)) printf("The number %d is not prime\n", x);
         else printf("The number %d is prime\n", x);
     }
-}
-
-int FIFO_read(){
-    fifo->start = (fifo->start + 1) % fifo->size;
-    int number_to_read = fifo->array[fifo->start];
-    fifo->array[fifo->start] = 0;
-    return number_to_read;
-}
-
-void FIFO_write(int number_to_write){
-    fifo->end = (fifo->end + 1) % fifo->size;
-    fifo->array[fifo->end] = number_to_write;
 }
 
 int main(int argc, char* argv[]){
