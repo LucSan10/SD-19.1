@@ -14,9 +14,9 @@ typedef struct{
 
 void wait(int* semaphore){
     while (*semaphore <= 0);
-    --(*semaphore);
+    (*semaphore)--;
 }
 
 void signal(int* semaphore){
-    ++(*semaphore);
+    (*semaphore)++;
 }

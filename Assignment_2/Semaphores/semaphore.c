@@ -9,8 +9,8 @@
 #include "semaphoreFunctions.h"
 
 #define MIN_VALUE 1
-#define MAX_VALUE 10000000
-#define ITERATION_LIMIT 100000
+#define MAX_VALUE 100
+#define ITERATION_LIMIT 1000
 
 typedef struct{
     int* array;
@@ -38,6 +38,15 @@ int random_number_generator(int min_val, int max_val){
     return min_val + (int) (uniform * interval);
 }
 
+void wait(int* semaphore){
+    while (*semaphore <= 0);
+    (*semaphore)--;
+}
+
+void signal(int* semaphore){
+    (*semaphore)++;
+}
+
 void* producer_thread(void* args){
     while(*iteration_limit > 0){
         int write = random_number_generator(MIN_VALUE, MAX_VALUE);
@@ -48,7 +57,7 @@ void* producer_thread(void* args){
         signal(&semaphores->mutex);
         signal(&semaphores->not_empty);
         
-        printf("Next value: %d", write);
+        printf("Next value: %d\n", write);
     }
 }
 
@@ -62,10 +71,21 @@ void* consumer_thread(void* args){
         
         (*iteration_limit)--;
         
-        printf("The number %d is ", x);
-        if (!prime(x)) printf("not ");
-        printf("prime.\n");
+        if (!prime(x)) printf("The number %d is not prime\n", x);
+        else printf("The number %d is prime\n", x);
     }
+}
+
+int FIFO_read(){
+    fifo->start = (fifo->start + 1) % fifo->size;
+    int number_to_read = fifo->array[fifo->start];
+    fifo->array[fifo->start] = 0;
+    return number_to_read;
+}
+
+void FIFO_write(int number_to_write){
+    fifo->end = (fifo->end + 1) % fifo->size;
+    fifo->array[fifo->end] = number_to_write;
 }
 
 int main(int argc, char* argv[]){
@@ -77,8 +97,6 @@ int main(int argc, char* argv[]){
 
     semaphores->not_empty = 0;
     semaphores->mutex = 1;
-
-    printf("hey\n");
 
     if (argc < 2){
         fprintf(stderr, "Array size missing.\n");
@@ -95,8 +113,6 @@ int main(int argc, char* argv[]){
         exit(EXIT_FAILURE);
     }
 
-    printf("heyy\n");
-
     int array_size = atoi(argv[1]);
     int producer_K = atoi(argv[2]);
     int consumer_K = atoi(argv[3]);
@@ -109,8 +125,6 @@ int main(int argc, char* argv[]){
     fifo->end = -1;
     fifo->size = array_size;
 
-    printf("heyyy\n");
-
     // measure time
     clock_t start, end;
     double cpu_time_used;
@@ -118,8 +132,6 @@ int main(int argc, char* argv[]){
 
     pthread_t producer_thread_ids[producer_K];
     pthread_t consumer_thread_ids[consumer_K];
-
-    printf("Starting\n");
 
     for (int i = 0; i < producer_K; i++){
         pthread_create(
@@ -130,8 +142,6 @@ int main(int argc, char* argv[]){
         );
     }
 
-    printf("Producer threads created.\n");
-
     for (int i = 0; i < consumer_K; i++){
         pthread_create(
             &consumer_thread_ids[i],
@@ -141,17 +151,21 @@ int main(int argc, char* argv[]){
         );
     }
 
-    printf("Consumer threads created.\n");
+    // for (int i = 0; i < consumer_K; i++){
+    //     pthread_join(consumer_thread_ids[i], NULL);
+    // }
 
-    for (int i = 0; i < producer_K; i++){
-        pthread_join(producer_thread_ids[i], NULL);
-    }
+    printf("Consumer threads joined.\n");
 
-    for (int i = 0; i < consumer_K; i++){
-        pthread_join(consumer_thread_ids[i], NULL);
-    }
+    // for (int i = 0; i < producer_K; i++){
+    //     pthread_join(producer_thread_ids[i], NULL);
+    // }
+
+    printf("Producer threads joined.\n");
 
     // time-end
     end = clock();
     cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
+    printf("Time taken to execute: %f s\n", cpu_time_used);
+    return 0;
 }
