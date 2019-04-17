@@ -7,6 +7,7 @@
 #include "../prime.h"
 #include "fifo.h"
 #include "semaphoreFunctions.h"
+#include <semaphore.h>
 
 #define MIN_VALUE 1
 #define MAX_VALUE 100
@@ -20,9 +21,9 @@ typedef struct{
 } Circular_FIFO;
 
 typedef struct{
-    int empty_buffers;
-    int full_buffers;
-    int mutex;
+    sem_t* empty_buffers;
+    sem_t* full_buffers;
+    sem_t* mutex;
 } Semaphores;
 
 static Circular_FIFO* fifo;
@@ -39,25 +40,16 @@ int random_number_generator(int min_val, int max_val){
     return min_val + (int) (uniform * interval);
 }
 
-void wait(int* semaphore){
-    while (*semaphore <= 0);
-    (*semaphore)--;
-}
-
-void signal(int* semaphore){
-    (*semaphore)++;
-}
-
 void* producer_thread(void* args){
     while(*producer_count < ITERATION_LIMIT){
         int write = random_number_generator(MIN_VALUE, MAX_VALUE);
 
-        wait(&semaphores->empty_buffers);
-        wait(&semaphores->mutex);
+        sem_wait(semaphores->empty_buffers);
+        sem_wait(semaphores->mutex);
         FIFO_write(write);
         (*producer_count)++;
-        signal(&semaphores->mutex);
-        signal(&semaphores->full_buffers);
+        sem_post(semaphores->mutex);
+        sem_post(semaphores->full_buffers);
         
         printf("Next value: %d\n", write);
     }
@@ -65,12 +57,12 @@ void* producer_thread(void* args){
 
 void* consumer_thread(void* args){
     while(*consumer_count < ITERATION_LIMIT){
-        wait(&semaphores->full_buffers);
-        wait(&semaphores->mutex);
+        sem_wait(semaphores->full_buffers);
+        sem_wait(semaphores->mutex);
         int x = FIFO_read();
         (*consumer_count)++;
-        signal(&semaphores->mutex);
-        signal(&semaphores->empty_buffers);
+        sem_post(semaphores->mutex);
+        sem_post(semaphores->empty_buffers);
         
         if (!prime(x)) printf("The number %d is not prime\n", x);
         else printf("The number %d is prime\n", x);
@@ -92,14 +84,13 @@ void FIFO_write(int number_to_write){
 int main(int argc, char* argv[]){
     fifo = (Circular_FIFO*) calloc(1, sizeof(Circular_FIFO));
     semaphores = (Semaphores*) calloc(1, sizeof(Semaphores));
+    semaphores->mutex = (sem_t*) malloc(sizeof(sem_t));
+    semaphores->empty_buffers = (sem_t*) malloc(sizeof(sem_t));
+    semaphores->full_buffers = (sem_t*) malloc(sizeof(sem_t));
     producer_count = (int*) calloc(1, sizeof(int));
     consumer_count = (int*) calloc(1, sizeof(int));
-
     srand(time(NULL));
-
-    semaphores->full_buffers = 0;
-    semaphores->mutex = 1;
-
+    
     if (argc < 2){
         fprintf(stderr, "Array size missing.\n");
         exit(EXIT_FAILURE);
@@ -119,7 +110,20 @@ int main(int argc, char* argv[]){
     int producer_K = atoi(argv[2]);
     int consumer_K = atoi(argv[3]);
 
-    semaphores->empty_buffers = array_size;
+    if (sem_init(semaphores->mutex, 0, 1) == -1) {
+        fprintf(stderr, "Semaphore mutex not inittialized.\n");
+        exit(EXIT_FAILURE);
+    }
+    if (sem_init(semaphores->empty_buffers, 0, array_size) == -1) {
+        fprintf(stderr, "Semaphore empty_buffers not inittialized.\n");
+        exit(EXIT_FAILURE);
+    }
+    if (sem_init(semaphores->full_buffers, 0, 0) == -1) {
+        fprintf(stderr, "Semaphore full_buffers not inittialized.\n");
+        exit(EXIT_FAILURE);
+    }
+    
+    
 
     fifo->array = (int*) calloc(array_size, sizeof(int));
     fifo->start = -1;
