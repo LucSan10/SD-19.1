@@ -178,13 +178,14 @@ int main(int argc, char* argv[]){
         for (int i = 0; i < consumer_K; i++){
             pthread_join(consumer_thread_ids[i], NULL);
         }
-
+    
         // time-end
         end = clock();
         cpu_time_used += ((double) (end - start)) / CLOCKS_PER_SEC;
     }
+    
     cpu_time_used /= 10;
-
+    printf("\nN, Np, Nc = %d, %d, %d\n", array_size, producer_K, consumer_K);
     printf("Time taken to execute: %f s\n", cpu_time_used);
     return 0;
 }
