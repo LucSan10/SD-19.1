@@ -59,9 +59,6 @@ void* producer_thread(void* args){
     int check;
     
     while(1){
-        sem_wait(semaphores->mutex);
-        check = (check_iteration(producer_count));
-        sem_post(semaphores->mutex);
 
         if (check) break;
 
@@ -70,6 +67,7 @@ void* producer_thread(void* args){
         sem_wait(semaphores->empty_buffers);
         sem_wait(semaphores->mutex);
         FIFO_write(write);
+        check = (check_iteration(producer_count));
         sem_post(semaphores->mutex);
         sem_post(semaphores->full_buffers);
     }
