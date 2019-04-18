@@ -66,7 +66,6 @@ int main(int argc, char* argv[]){
     // New seed for rand().
     srand(time(NULL));
 
-    accumulator = 0;
 
     if (argc < 2){
         fprintf(stderr, "Input array size missing.\n");
@@ -92,10 +91,10 @@ int main(int argc, char* argv[]){
     clock_t start, end;
 
     for (int i = 0; i < 10; i++){
+        accumulator = 0;
+        pthread_t thread_ids[K];
         
         start = clock();
-
-        pthread_t thread_ids[K];
 
         for(int i = 0; i < K; i++){
 
@@ -115,7 +114,6 @@ int main(int argc, char* argv[]){
         end = clock();
         cpu_time_used += ((double) (end - start)) / CLOCKS_PER_SEC;
 
-        printf("\nK, N = %d, %d\n", K, N);
         
         // printf("[");
         // for (int i = 0; i < N-1; i++){
@@ -125,6 +123,7 @@ int main(int argc, char* argv[]){
 
         printf("Total sum: %d\n", accumulator);
     }
+    printf("\nK, N = %d, %d\n", K, N);
     cpu_time_used /= 10;
     
     printf("Time taken to execute: %f s\n", cpu_time_used);

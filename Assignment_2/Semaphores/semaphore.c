@@ -88,8 +88,8 @@ void* consumer_thread(void* args){
         sem_post(semaphores->mutex);
         sem_post(semaphores->empty_buffers);
         
-        if (!prime(x)) printf("The number %d is not prime\n", x);
-        else printf("The number %d is prime\n", x);
+        //if (!prime(x)) printf("The number %d is not prime\n", x);
+        //else printf("The number %d is prime\n", x);
     }
 }
 
@@ -138,8 +138,6 @@ int main(int argc, char* argv[]){
         fprintf(stderr, "Semaphore full_buffers not inittialized.\n");
         exit(EXIT_FAILURE);
     }
-    
-    
 
     fifo->array = (int*) calloc(array_size, sizeof(int));
     fifo->start = -1;
