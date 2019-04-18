@@ -38,11 +38,6 @@ int random_number_generator(int min_val, int max_val){
     return min_val + (int) (uniform * interval);
 }
 
-int check_iteration(int* iter){
-    (*iter)++;
-    return (*iter > ITERATION_LIMIT);
-}
-
 int FIFO_read(){
     fifo->start = (fifo->start + 1) % fifo->size;
     int number_to_read = fifo->array[fifo->start];
@@ -60,10 +55,10 @@ void* producer_thread(void* args){
     
     while(1){
         sem_wait(semaphores->mutex);
-        check = (check_iteration(producer_count));
+        (*producer_count)++;
         sem_post(semaphores->mutex);
 
-        if (check) break;
+        if (*producer_count > ITERATION_LIMIT) break;
 
         int write = random_number_generator(MIN_VALUE, MAX_VALUE);
 
@@ -80,10 +75,10 @@ void* consumer_thread(void* args){
     
     while(1){
         sem_wait(semaphores->mutex);
-        check = (check_iteration(consumer_count));
+        (*consumer_count)++;
         sem_post(semaphores->mutex);
 
-        if (check) break;
+        if (*consumer_count > ITERATION_LIMIT) break;
 
         sem_wait(semaphores->full_buffers);
         sem_wait(semaphores->mutex);
