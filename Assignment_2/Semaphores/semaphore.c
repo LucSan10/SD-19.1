@@ -51,14 +51,15 @@ void FIFO_write(int number_to_write){
 }
 
 void* producer_thread(void* args){
+
     int check;
-    
     while(1){
         sem_wait(semaphores->mutex);
         (*producer_count)++;
+        check = (*producer_count > ITERATION_LIMIT);
         sem_post(semaphores->mutex);
 
-        if (*producer_count > ITERATION_LIMIT) break;
+        if (check) break;
 
         int write = random_number_generator(MIN_VALUE, MAX_VALUE);
 
@@ -71,14 +72,15 @@ void* producer_thread(void* args){
 }
 
 void* consumer_thread(void* args){
-    int check;
     
+    int check;
     while(1){
         sem_wait(semaphores->mutex);
         (*consumer_count)++;
+        check = (*consumer_count > ITERATION_LIMIT);
         sem_post(semaphores->mutex);
-
-        if (*consumer_count > ITERATION_LIMIT) break;
+        
+        if (check) break;
 
         sem_wait(semaphores->full_buffers);
         sem_wait(semaphores->mutex);
@@ -119,6 +121,10 @@ int main(int argc, char* argv[]){
     int array_size = atoi(argv[1]);
     int producer_K = atoi(argv[2]);
     int consumer_K = atoi(argv[3]);
+
+    sem_init(semaphores->mutex, 0, 1);
+    sem_init(semaphores->empty_buffers, 0, array_size);
+    sem_init(semaphores->full_buffers, 0, 0);
 
     if (sem_init(semaphores->mutex, 0, 1) == -1) {
         fprintf(stderr, "Semaphore mutex not inittialized.\n");
