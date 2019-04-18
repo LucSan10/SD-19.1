@@ -88,38 +88,44 @@ int main(int argc, char* argv[]){
     populate_array_randomly(arr, N, MIN_VALUE, MAX_VALUE);
 
     // measure time
+    double cpu_time_used = 0;
     clock_t start, end;
-    double cpu_time_used;
-    start = clock();
 
-    pthread_t thread_ids[K];
+    for (int i = 0; i < 10; i++){
+        
+        start = clock();
 
-    for(int i = 0; i < K; i++){
+        pthread_t thread_ids[K];
 
-        pthread_create(
-            &thread_ids[i],
-            NULL,
-            thread_execute_sum,
-            &interval[i]
-        );
+        for(int i = 0; i < K; i++){
+
+            pthread_create(
+                &thread_ids[i],
+                NULL,
+                thread_execute_sum,
+                &interval[i]
+            );
+        }
+
+        for(int i = 0; i < K; i++){
+            pthread_join(thread_ids[i], NULL);
+        }
+        
+        // time-end
+        end = clock();
+        cpu_time_used += ((double) (end - start)) / CLOCKS_PER_SEC;
+
+        printf("\nK, N = %d, %d\n", K, N);
+        
+        // printf("[");
+        // for (int i = 0; i < N-1; i++){
+        //     printf("%d, ", arr[i]);
+        // }
+        // printf("%d]", arr[N-1]);
+
+        printf("Total sum: %d\n", accumulator);
     }
-
-    for(int i = 0; i < K; i++){
-        pthread_join(thread_ids[i], NULL);
-    }
-
-    // time-end
-    end = clock();
-    cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
-
-    printf("\nK, N = %d, %d\n", K, N);
+    cpu_time_used /= 10;
     
-    // printf("[");
-    // for (int i = 0; i < N-1; i++){
-    //     printf("%d, ", arr[i]);
-    // }
-    // printf("%d]", arr[N-1]);
-
-    printf("Total sum: %d\n", accumulator);
     printf("Time taken to execute: %f s\n", cpu_time_used);
 }

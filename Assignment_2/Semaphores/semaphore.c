@@ -146,40 +146,45 @@ int main(int argc, char* argv[]){
     // measure time
     clock_t start, end;
     double cpu_time_used;
-    start = clock();
 
-    pthread_t producer_thread_ids[producer_K];
-    pthread_t consumer_thread_ids[consumer_K];
+    for (int i = 0; i < 10; i++){
+        start = clock();
 
-    for (int i = 0; i < producer_K; i++){
-        pthread_create(
-            &producer_thread_ids[i],
-            NULL,
-            producer_thread,
-            NULL
-        );
+        pthread_t producer_thread_ids[producer_K];
+        pthread_t consumer_thread_ids[consumer_K];
+
+        for (int i = 0; i < producer_K; i++){
+            pthread_create(
+                &producer_thread_ids[i],
+                NULL,
+                producer_thread,
+                NULL
+            );
+        }
+
+        for (int i = 0; i < consumer_K; i++){
+            pthread_create(
+                &consumer_thread_ids[i],
+                NULL,
+                consumer_thread,
+                NULL
+            );
+        }
+
+        for (int i = 0; i < producer_K; i++){
+            pthread_join(producer_thread_ids[i], NULL);
+        }
+
+        for (int i = 0; i < consumer_K; i++){
+            pthread_join(consumer_thread_ids[i], NULL);
+        }
+
+        // time-end
+        end = clock();
+        cpu_time_used += ((double) (end - start)) / CLOCKS_PER_SEC;
     }
+    cpu_time_used /= 10;
 
-    for (int i = 0; i < consumer_K; i++){
-        pthread_create(
-            &consumer_thread_ids[i],
-            NULL,
-            consumer_thread,
-            NULL
-        );
-    }
-
-    for (int i = 0; i < producer_K; i++){
-        pthread_join(producer_thread_ids[i], NULL);
-    }
-
-    for (int i = 0; i < consumer_K; i++){
-        pthread_join(consumer_thread_ids[i], NULL);
-    }
-
-    // time-end
-    end = clock();
-    cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
     printf("Time taken to execute: %f s\n", cpu_time_used);
     return 0;
 }
