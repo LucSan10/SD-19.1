@@ -1,3 +1,6 @@
+#define _GNU_SOURCE
+#include <unistd.h>
+#include <sched.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdatomic.h>
@@ -94,6 +97,9 @@ void* consumer_thread(void* args){
 }
 
 int main(int argc, char* argv[]){
+
+    cpu_set_t cpus;
+
     fifo = (Circular_FIFO*) calloc(1, sizeof(Circular_FIFO));
     semaphores = (Semaphores*) calloc(1, sizeof(Semaphores));
     semaphores->mutex = (sem_t*) malloc(sizeof(sem_t));
@@ -154,7 +160,15 @@ int main(int argc, char* argv[]){
         pthread_t producer_thread_ids[producer_K];
         pthread_t consumer_thread_ids[consumer_K];
 
+        pthread_attr_t attr;
+        pthread_attr_init(&attr);
+
         for (int i = 0; i < producer_K; i++){
+
+            CPU_ZERO(&cpus);
+            CPU_SET(i%4, &cpus);
+            pthread_attr_setaffinity_np(&attr, sizeof(cpu_set_t), &cpus);
+
             pthread_create(
                 &producer_thread_ids[i],
                 NULL,
@@ -164,6 +178,11 @@ int main(int argc, char* argv[]){
         }
 
         for (int i = 0; i < consumer_K; i++){
+
+            CPU_ZERO(&cpus);
+            CPU_SET(i%4, &cpus);
+            pthread_attr_setaffinity_np(&attr, sizeof(cpu_set_t), &cpus);
+
             pthread_create(
                 &consumer_thread_ids[i],
                 NULL,

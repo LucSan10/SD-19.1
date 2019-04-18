@@ -1,9 +1,12 @@
+#define _GNU_SOURCE
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdatomic.h>
 #include <time.h>
 #include <stdint.h>
 #include <pthread.h>
+#include <unistd.h>
+#include <sched.h>
 #define MIN_VALUE -100
 #define MAX_VALUE 100
 
@@ -66,6 +69,7 @@ int main(int argc, char* argv[]){
     // New seed for rand().
     srand(time(NULL));
 
+    cpu_set_t cpus;
 
     if (argc < 2){
         fprintf(stderr, "Input array size missing.\n");
@@ -93,14 +97,21 @@ int main(int argc, char* argv[]){
     for (int i = 0; i < 10; i++){
         accumulator = 0;
         pthread_t thread_ids[K];
+
+        pthread_attr_t attr;
+        pthread_attr_init(&attr);
         
         start = clock();
 
         for(int i = 0; i < K; i++){
 
+            CPU_ZERO(&cpus);
+            CPU_SET(i%4, &cpus);
+            pthread_attr_setaffinity_np(&attr, sizeof(cpu_set_t), &cpus);
+
             pthread_create(
                 &thread_ids[i],
-                NULL,
+                &attr,
                 thread_execute_sum,
                 &interval[i]
             );
