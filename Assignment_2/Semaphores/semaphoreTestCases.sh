@@ -5,8 +5,8 @@
 N=$((1))
 for i in {1..6}
 do
-    M=$((2))
-    for j in {1..4}
+    M=$((1))
+    for j in {1..5}
     do
         ./semaphore $N 1 $M
         ./semaphore $N $M 1
