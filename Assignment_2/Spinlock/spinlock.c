@@ -5,8 +5,6 @@
 #include <time.h>
 #include <stdint.h>
 #include <pthread.h>
-#include <unistd.h>
-#include <sched.h>
 #define MIN_VALUE -100
 #define MAX_VALUE 100
 
@@ -15,7 +13,7 @@ typedef struct{
     int end;
 } Interval;
 
-int accumulator;
+int64_t accumulator;
 int8_t* arr;
 
 atomic_flag lock = ATOMIC_FLAG_INIT;
@@ -54,10 +52,10 @@ void calculate_intervals(Interval* interval, int N, int K){
 
 void* thread_execute_sum(void* args){
     Interval* interval = args;
-    int temp = 0;
+    int64_t temp = 0;
     
     for (int i = interval->start; i < interval->end; i++){
-        temp += (int) arr[i];
+        temp += (int64_t) arr[i];
     }
     
     acquire(&lock);
@@ -68,8 +66,6 @@ void* thread_execute_sum(void* args){
 int main(int argc, char* argv[]){
     // New seed for rand().
     srand(time(NULL));
-
-    cpu_set_t cpus;
 
     if (argc < 2){
         fprintf(stderr, "Input array size missing.\n");
@@ -91,27 +87,19 @@ int main(int argc, char* argv[]){
     populate_array_randomly(arr, N, MIN_VALUE, MAX_VALUE);
 
     // measure time
-    double cpu_time_used = 0;
-    clock_t start, end;
+    struct timespec start, finish;
+    double elapsed = 0;
 
     for (int i = 0; i < 10; i++){
         accumulator = 0;
         pthread_t thread_ids[K];
 
-        pthread_attr_t attr;
-        pthread_attr_init(&attr);
-        
-        start = clock();
+        clock_gettime(CLOCK_MONOTONIC, &start);
 
         for(int i = 0; i < K; i++){
-
-            CPU_ZERO(&cpus);
-            CPU_SET(i%4, &cpus);
-            pthread_attr_setaffinity_np(&attr, sizeof(cpu_set_t), &cpus);
-
             pthread_create(
                 &thread_ids[i],
-                &attr,
+                NULL,
                 thread_execute_sum,
                 &interval[i]
             );
@@ -122,20 +110,15 @@ int main(int argc, char* argv[]){
         }
         
         // time-end
-        end = clock();
-        cpu_time_used += ((double) (end - start)) / CLOCKS_PER_SEC;
+        clock_gettime(CLOCK_MONOTONIC, &finish);
 
-        
-        // printf("[");
-        // for (int i = 0; i < N-1; i++){
-        //     printf("%d, ", arr[i]);
-        // }
-        // printf("%d]", arr[N-1]);
+        elapsed += (finish.tv_sec - start.tv_sec);
+        elapsed += (finish.tv_nsec - start.tv_nsec) / 1000000000.0;
 
-        printf("Total sum: %d\n", accumulator);
+        printf("Total sum: %ld\n", accumulator);
     }
     printf("\nK, N = %d, %d\n", K, N);
-    cpu_time_used /= 10;
+    elapsed /= 10;
     
-    printf("Time taken to execute: %f s\n", cpu_time_used);
+    printf("Time taken to execute: %fs\n", elapsed);
 }

@@ -98,7 +98,8 @@ void* consumer_thread(void* args){
 
 int main(int argc, char* argv[]){
 
-    cpu_set_t cpus;
+    cpu_set_t producer_cpus;
+    cpu_set_t consumer_cpus;
 
     fifo = (Circular_FIFO*) calloc(1, sizeof(Circular_FIFO));
     semaphores = (Semaphores*) calloc(1, sizeof(Semaphores));
@@ -151,24 +152,17 @@ int main(int argc, char* argv[]){
     fifo->size = array_size;
 
     // measure time
-    clock_t start, end;
-    double cpu_time_used;
+    struct timespec start, finish;
+    double elapsed = 0;
 
     for (int i = 0; i < 10; i++){
-        start = clock();
 
         pthread_t producer_thread_ids[producer_K];
         pthread_t consumer_thread_ids[consumer_K];
 
-        pthread_attr_t attr;
-        pthread_attr_init(&attr);
+        clock_gettime(CLOCK_MONOTONIC, &start);
 
         for (int i = 0; i < producer_K; i++){
-
-            CPU_ZERO(&cpus);
-            CPU_SET(i%4, &cpus);
-            pthread_attr_setaffinity_np(&attr, sizeof(cpu_set_t), &cpus);
-
             pthread_create(
                 &producer_thread_ids[i],
                 NULL,
@@ -178,11 +172,6 @@ int main(int argc, char* argv[]){
         }
 
         for (int i = 0; i < consumer_K; i++){
-
-            CPU_ZERO(&cpus);
-            CPU_SET(i%4, &cpus);
-            pthread_attr_setaffinity_np(&attr, sizeof(cpu_set_t), &cpus);
-
             pthread_create(
                 &consumer_thread_ids[i],
                 NULL,
@@ -200,12 +189,14 @@ int main(int argc, char* argv[]){
         }
     
         // time-end
-        end = clock();
-        cpu_time_used += ((double) (end - start)) / CLOCKS_PER_SEC;
+        clock_gettime(CLOCK_MONOTONIC, &finish);
+
+        elapsed += (finish.tv_sec - start.tv_sec);
+        elapsed += (finish.tv_nsec - start.tv_nsec) / 1000000000.0;
     }
-    
-    cpu_time_used /= 10;
+
+    elapsed /= 10;
     printf("\nN, Np, Nc = %d, %d, %d\n", array_size, producer_K, consumer_K);
-    printf("Time taken to execute: %f s\n", cpu_time_used);
+    printf("Time taken to execute: %fs\n", elapsed);
     return 0;
 }
