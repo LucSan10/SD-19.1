@@ -1,17 +1,18 @@
-import time
 import socket
 
 BUFFERSIZE = 1024
 class Orchestrator:
-    port = None
-    host = None
     members = []
+    serverSocket = None
 
     def __init__(self, host, port):
-        self.host = host
-        self.port = port
+        self.serverSocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        self.serverSocket.bind((host, port))
 
         self.initListening()
     
     def initListening(self):
-        print("TODO Listening")
+        print('orchestrator will start listening...', flush=True)
+        while True:
+            message, address = self.serverSocket.recvfrom(1024)
+            print("message: %s \n address: %s", flush=True)
