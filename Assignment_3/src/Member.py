@@ -8,13 +8,13 @@ PORT = 0 # PORT 0 will make the system automatically assign a port to it
 BUFFERSIZE = 1024
 class Member:
     orchestratorAddress = None
-    clientSocket = None
+    socket = None
 
     def __init__(self, orchestratorAddress):
         self.orchestratorAddress = orchestratorAddress
-        self.clientSocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     
     def joinSwarm(self):
         message = Message(MessageType.JOIN_SWARM, 'asdas', 'a', '2')
         print(message.toByteStr(), flush=True)
-        self.clientSocket.sendto(message.toByteStr(), self.orchestratorAddress)
+        self.socket.sendto(message.toByteStr(), self.orchestratorAddress)
