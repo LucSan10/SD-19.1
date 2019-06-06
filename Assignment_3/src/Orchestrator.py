@@ -1,5 +1,5 @@
 import socket
-from src.Message import Message
+from src.Message import *
 
 BUFFERSIZE = 1024
 class Orchestrator:
@@ -17,4 +17,8 @@ class Orchestrator:
         while True:
             response, address = self.serverSocket.recvfrom(1024)
             message = Message.parse(response)
-            print(message, flush = True)
+            if(message.type == MessageType.JOIN_SWARM):
+                print('join', flush=True)
+                continue
+
+            raise NotImplementedError(message.type)
