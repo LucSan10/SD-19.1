@@ -19,5 +19,13 @@ class Message:
     def __str__(self):
         return str(self.type.value) + '|' + '|'.join(self.params)
     
+    @staticmethod
+    def parse(message):
+        text = message.decode('utf8').split('|')   
+        return Message(
+            MessageType(int(text[0])),
+            *text[1:]
+        )
+
     def toByteStr(self):
         return str.encode(self.__str__())

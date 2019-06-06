@@ -1,4 +1,5 @@
 import socket
+from src.Message import Message
 
 BUFFERSIZE = 1024
 class Orchestrator:
@@ -14,5 +15,6 @@ class Orchestrator:
     def initListening(self):
         print('orchestrator will start listening...', flush=True)
         while True:
-            message, address = self.serverSocket.recvfrom(1024)
-            print("message: %s \n address: %s" % (message, address), flush=True)
+            response, address = self.serverSocket.recvfrom(1024)
+            message = Message.parse(response)
+            print(message, flush = True)
