@@ -1,5 +1,6 @@
 import socket
 from src.Message import *
+import json
 
 BUFFERSIZE = 1024
 class Orchestrator:
@@ -18,7 +19,15 @@ class Orchestrator:
             response, address = self.socket.recvfrom(1024)
             message = Message.parse(response)
             if(message.type == MessageType.JOIN_SWARM):
-                print('New member (%s, %s) joining swarm' % (address[0], address[1]) , flush=True)
+                self.joinMemberSwarm(address)
                 continue
 
             raise NotImplementedError(message.type)
+
+    def joinMemberSwarm(self, address):
+        self.socket.sendto(
+            str.encode(json.dumps(self.members)), 
+            address
+        )
+        self.members.append(address)
+        print('New member (%s, %s) joining swarm' % (address[0], address[1]) , flush=True)

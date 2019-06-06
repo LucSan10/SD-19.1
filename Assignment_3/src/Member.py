@@ -13,8 +13,12 @@ class Member:
     def __init__(self, orchestratorAddress):
         self.orchestratorAddress = orchestratorAddress
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        self.socket.bind((HOST, 0))
     
     def joinSwarm(self):
         message = Message(MessageType.JOIN_SWARM, 'asdas', 'a', '2')
         print(message.toByteStr(), flush=True)
         self.socket.sendto(message.toByteStr(), self.orchestratorAddress)
+        response, address = self.socket.recvfrom(1024)
+        print(response, flush=True)
+        
