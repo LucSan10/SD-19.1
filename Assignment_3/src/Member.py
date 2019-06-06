@@ -18,7 +18,7 @@ class Member:
         self.socket.bind((HOST, 0))
     
     def joinSwarm(self):
-        message = Message(MessageType.JOIN_SWARM, 'asdas', 'a', '2')
+        message = Message(MessageType.JOIN_SWARM)
         print(message.toByteStr(), flush=True)
         self.socket.sendto(message.toByteStr(), self.orchestratorAddress)
         response, address = self.socket.recvfrom(1024)
