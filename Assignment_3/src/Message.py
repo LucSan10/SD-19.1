@@ -17,10 +17,7 @@ class Message:
         self.params = params
     
     def __str__(self):
-        return str(self.type) + '|' + '|'.join(self.params)
-    
-    def parseToStr(self, type, *params):
-        return str(type) + '|' + '|'.join(params)
+        return str(self.type.value) + '|' + '|'.join(self.params)
     
     def toByteStr(self):
         return str.encode(self.__str__())
