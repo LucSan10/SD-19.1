@@ -6,6 +6,7 @@ class MessageType(Enum):
     LEADER = 3
     ALIVE = 4
     ALIVE_OK = 5
+    JOIN_SWARM = 6
 
 class Message:
     type = None
@@ -14,3 +15,12 @@ class Message:
     def __init__(self, type, *params):
         self.type = type
         self.params = params
+    
+    def __str__(self):
+        return str(self.type) + '|' + '|'.join(self.params)
+    
+    def parseToStr(self, type, *params):
+        return str(type) + '|' + '|'.join(params)
+    
+    def toByteStr(self):
+        return str.encode(self.__str__())

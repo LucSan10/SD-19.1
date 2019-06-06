@@ -15,4 +15,4 @@ class Orchestrator:
         print('orchestrator will start listening...', flush=True)
         while True:
             message, address = self.serverSocket.recvfrom(1024)
-            print("message: %s \n address: %s", flush=True)
+            print("message: %s \n address: %s" % (message, address), flush=True)
