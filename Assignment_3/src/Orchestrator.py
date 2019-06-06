@@ -18,7 +18,7 @@ class Orchestrator:
             response, address = self.serverSocket.recvfrom(1024)
             message = Message.parse(response)
             if(message.type == MessageType.JOIN_SWARM):
-                print('join', flush=True)
+                print('New member (%s, %s) joining swarm' % (address[0], address[1]) , flush=True)
                 continue
 
             raise NotImplementedError(message.type)
