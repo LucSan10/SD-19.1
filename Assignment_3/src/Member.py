@@ -2,6 +2,7 @@ import time
 import socket
 from src.Message import Message
 from src.Message import MessageType
+from src.MemberInterfaceThread import MemberInterfaceThread
 import json
 
 HOST = '127.0.0.1'  # Standard loopback interface address (localhost)
@@ -11,21 +12,12 @@ class Member:
     orchestratorAddress = None
     socket = None
     swarmMembers = []
+    interfaceThread = None
 
     def __init__(self, orchestratorAddress):
-        self.orchestratorAddress = orchestratorAddress
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.socket.bind((HOST, 0))
+        self.interfaceThread = MemberInterfaceThread(self.socket)
     
-    def joinSwarm(self):
-        message = Message(MessageType.JOIN_SWARM)
-        print(message.toByteStr(), flush=True)
-        self.socket.sendto(message.toByteStr(), self.orchestratorAddress)
-        response, address = self.socket.recvfrom(1024)
-        print("Swarm members: %s" % (response), flush=True)
-        self.swarmMembers = json.loads(response)
-        self.connectWithOtherMembers()
-    
-    def connectWithOtherMembers(self):
-        for member in self.swarmMembers:
-            print(member)
+    def start(self):
+        self.interfaceThread.start()
