@@ -2,7 +2,6 @@ import time
 import socket
 from src.MemberInterfaceThread import MemberInterfaceThread
 from src.MemberCommunicationThread import MemberCommunicationThread
-import json
 
 HOST = '127.0.0.1'  # Standard loopback interface address (localhost)
 PORT = 0 # PORT 0 will make the system automatically assign a port to it

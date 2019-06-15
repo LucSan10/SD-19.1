@@ -33,10 +33,10 @@ class Orchestrator:
 
     def joinSwarm(self, address):
         self.members.append(address)
-        print('(%s, %s) getting members' % (address[0], address[1]) , flush=True)
+        print('New member (%s, %s) joining swarm' % (address[0], address[1]) , flush=True)
 
     def getMembers(self, address):
-        print('New member (%s, %s) joining swarm' % (address[0], address[1]) , flush=True)
+        print('(%s, %s) getting members' % (address[0], address[1]) , flush=True)
         self.socket.sendto(
             str.encode(json.dumps(self.members)), 
             address
