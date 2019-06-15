@@ -7,6 +7,7 @@ class MessageType(Enum):
     ALIVE = 4
     ALIVE_OK = 5
     JOIN_SWARM = 6
+    GET_MEMBERS = 7
 
 class Message:
     type = None
