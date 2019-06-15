@@ -1,6 +1,7 @@
 import socket
 from src.Message import *
 import json
+import sys
 
 BUFFERSIZE = 1024
 class Orchestrator:
@@ -24,6 +25,9 @@ class Orchestrator:
             if(message.type == MessageType.GET_MEMBERS):
                 self.getMembers(address)
                 continue
+            if(message.type == MessageType.KILL):
+                print('finishing', flush=True)
+                sys.exit(1)
 
             raise NotImplementedError(message.type)
 
