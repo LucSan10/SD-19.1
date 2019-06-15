@@ -28,4 +28,5 @@ class MemberInterfaceThread (threading.Thread):
     def handleOption(self, option):
         if(option == OPTIONS.FINISH.value):
             print('finishing', flush=True)
+            self.socket.close()
             sys.exit(1)

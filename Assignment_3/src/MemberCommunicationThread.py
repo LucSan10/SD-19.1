@@ -41,8 +41,8 @@ class MemberCommunicationThread (threading.Thread):
             self.socket.sendto(message.toByteStr(), tuple(member))
     
     def listen(self):
-        print('listening', flush=True)
         while True:
+            print('listening to receive message', flush=True)
             response, address = self.socket.recvfrom(1024)
             message = Message.parse(response)
             if(message.type == MessageType.JOIN_SWARM):
