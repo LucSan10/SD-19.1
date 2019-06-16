@@ -31,7 +31,8 @@ class MemberCommunicationThread (threading.Thread):
     def getSwarmMembers(self):
         self.socket.send(MessageType.GET_MEMBERS, self.orchestratorAddress)
         response, address = self.socket.receive()
-        self.swarmMembers = json.loads(response)
+        message = Message.parse(response)
+        self.swarmMembers = json.loads(message.params[0])
     
     def enterSwarm(self):
         self.socket.send(MessageType.JOIN_SWARM, self.orchestratorAddress)
