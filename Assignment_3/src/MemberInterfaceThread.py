@@ -84,7 +84,7 @@ class MemberInterfaceThread (threading.Thread):
             print("Leader is DEAD!", flush=True)
 
     def failProcess(self):
-        self.sharedData['failProcessLock'].acquire()
+        self.sharedData['failProcess'] = True
 
     def recoverProcess(self):
-        self.sharedData['failProcessLock'].release()
+        self.sharedData['failProcess'] = False

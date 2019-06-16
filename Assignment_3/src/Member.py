@@ -15,7 +15,7 @@ class Member:
                 "address": None, # if isLeader false, stores the leader address
                 "isAlive": False, # whether the leader is alive or not
             },
-            "failProcessLock": threading.Lock() # locks the communication if process is failed
+            "failProcess": False # whether the communication of the process blocked "failed member"
         }
 
         socket = SocketWrapper(sharedData)

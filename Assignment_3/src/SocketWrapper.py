@@ -1,4 +1,5 @@
 from src.Message import Message
+from src.Message import MessageType
 import socket
 import json
 
@@ -22,10 +23,13 @@ class SocketWrapper ():
         )
 
     def receive(self):
-        self.sharedData['failProcessLock'].acquire()
-        result = self.socket.recvfrom(BUFFERSIZE)
-        self.sharedData['failProcessLock'].release()
-        return result
+        response, address = self.socket.recvfrom(BUFFERSIZE)
+        message = Message.parse(response)
+        if(self.sharedData['failProcess']):
+            if(message.type == MessageType.ALIVE):
+                return self.receive()
+
+        return (response, address)
     
     def getsockname(self):
         return self.socket.getsockname()
