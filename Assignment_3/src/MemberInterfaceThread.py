@@ -19,6 +19,16 @@ class MemberInterfaceThread (threading.Thread):
             "value": "2",
             "description": "check whether leader is alive",
             "handler": "isLeaderIsAlive"
+        },
+        {
+            "value": "3",
+            "description": "fail process",
+            "handler": "failProcess"
+        },
+        {
+            "value": "4",
+            "description": "recover process",
+            "handler": "recoverProcess"
         }
     ]
 
@@ -72,3 +82,9 @@ class MemberInterfaceThread (threading.Thread):
             print("Leader is alive!", flush=True)
         else:
             print("Leader is DEAD!", flush=True)
+
+    def failProcess(self):
+        self.sharedData['failProcessLock'].acquire()
+
+    def recoverProcess(self):
+        self.sharedData['failProcessLock'].release()

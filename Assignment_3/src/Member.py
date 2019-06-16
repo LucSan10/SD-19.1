@@ -2,6 +2,7 @@ import time
 from src.MemberInterfaceThread import MemberInterfaceThread
 from src.MemberCommunicationThread import MemberCommunicationThread
 from src.SocketWrapper import SocketWrapper
+import threading
 
 class Member:
     interfaceThread = None
@@ -13,7 +14,8 @@ class Member:
                 "isSelf": False, # is this member the leader
                 "address": None, # if isLeader false, stores the leader address
                 "isAlive": False, # whether the leader is alive or not
-            }
+            },
+            "failProcessLock": threading.Lock() # locks the communication if process is failed
         }
 
         socket = SocketWrapper(sharedData)
