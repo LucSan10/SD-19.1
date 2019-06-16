@@ -7,7 +7,6 @@ import json
 
 class MemberCommunicationThread (threading.Thread):
     socket = None
-    address = None
     swarmMembers = []
     orchestratorAddress = None
     sharedData = None
