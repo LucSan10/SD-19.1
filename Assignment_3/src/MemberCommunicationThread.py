@@ -10,11 +10,13 @@ class MemberCommunicationThread (threading.Thread):
     address = None
     swarmMembers = []
     orchestratorAddress = None
+    sharedData = None
 
-    def __init__(self, socket, orchestratorAddress):
+    def __init__(self, socket, orchestratorAddress, sharedData):
         threading.Thread.__init__(self)
         self.socket = socket
         self.orchestratorAddress = orchestratorAddress
+        self.sharedData = sharedData
     
     def run(self):
         address = self.socket.getsockname()
@@ -25,6 +27,7 @@ class MemberCommunicationThread (threading.Thread):
     def joinSwarm(self):
         self.getSwarmMembers()
         self.enterSwarm()
+        self.checkIfFirstMemberAndLeader()
 
     def getSwarmMembers(self):
         message = Message(MessageType.GET_MEMBERS)
@@ -47,6 +50,13 @@ class MemberCommunicationThread (threading.Thread):
             message = Message.parse(response)
             if(message.type == MessageType.JOIN_SWARM):
                 self.saveNewMemberToSwarm(address)
+                if(self.sharedData['isLeader']):
+                    self.announcesLeadership(address)
+                continue
+            if(message.type == MessageType.LEADER):
+                self.sharedData['isLeader'] = False
+                self.sharedData['leader'] = address
+                print('Leader is ', address)
                 continue
 
             raise NotImplementedError(message.type)
@@ -54,3 +64,13 @@ class MemberCommunicationThread (threading.Thread):
     def saveNewMemberToSwarm(self, address):
         self.swarmMembers.append(address)
         print('New member (%s, %s) joining swarm' % (address[0], address[1]) , flush=True)
+    
+    # if is first member, declares itself as leader
+    def checkIfFirstMemberAndLeader(self):
+        if(len(self.swarmMembers) == 0):
+            self.sharedData['isLeader'] = True
+            print('is leader')
+
+    def announcesLeadership(self, address):
+        message = Message(MessageType.LEADER)
+        self.socket.sendto(message.toByteStr(), address)

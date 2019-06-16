@@ -8,9 +8,12 @@ class OPTIONS(Enum):
 
 class MemberInterfaceThread (threading.Thread):
     socket = None
-    def __init__(self, socket):
+    sharedData = None
+
+    def __init__(self, socket, sharedData):
         threading.Thread.__init__(self)
         self.socket = socket
+        self.sharedData = sharedData
     
     def run(self):
         address = self.socket.getsockname()

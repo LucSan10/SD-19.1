@@ -14,8 +14,13 @@ class Member:
     def __init__(self, orchestratorAddress):
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.socket.bind((HOST, 0))
-        self.interfaceThread = MemberInterfaceThread(self.socket)
-        self.communicationThread = MemberCommunicationThread(self.socket, orchestratorAddress)
+        sharedData = {
+            "isLeader": False, # is this member the leader
+            "leader": None # if "isLeader" is False, "leader" stores the leader's address
+        }
+
+        self.interfaceThread = MemberInterfaceThread(self.socket, sharedData)
+        self.communicationThread = MemberCommunicationThread(self.socket, orchestratorAddress, sharedData)
     
     def start(self):
         self.interfaceThread.start()
