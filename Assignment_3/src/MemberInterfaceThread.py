@@ -8,13 +8,20 @@ import time
 
 SECONDS_TO_WAIT_FOR_ALIVE_RESPONSE = 2
 
-class OPTIONS(Enum):
-    FINISH = "1"
-    CHECK_LEADER_ALIVE = "2"
-    ELECTION = "3"
-
-
 class MemberInterfaceThread (threading.Thread):
+    OPTIONS = [
+        {
+            "value": "1",
+            "description": "finish process",
+            "handler": "finishProcess"
+        },
+        {
+            "value": "2",
+            "description": "check whether leader is alive",
+            "handler": "isLeaderIsAlive"
+        }
+    ]
+
     socket = None
     sharedData = None
 
@@ -34,16 +41,18 @@ class MemberInterfaceThread (threading.Thread):
     def printMainMenu(self):
         print('==========================')
         print('Options:')
-        print(OPTIONS.FINISH.value + ' - finish process')
-        print(OPTIONS.CHECK_LEADER_ALIVE.value + ' - check whether leader is alive')
+        for option in self.OPTIONS:
+            print(option["value"], ' - ', option['description'])
 
-    def handleOption(self, option):
-        if(option == OPTIONS.FINISH.value):
-            print('finishing', flush=True)
-            self.socket.close()
-            sys.exit(1)
-        if(option == OPTIONS.CHECK_LEADER_ALIVE.value):
-            self.isLeaderIsAlive()
+    def handleOption(self, choice):
+        for option in self.OPTIONS:
+            if(option["value"] == choice):
+                getattr(self, option['handler'])()
+    
+    def finishProcess(self):
+        print('finishing', flush=True)
+        self.socket.close()
+        sys.exit(1)
 
     def isLeaderIsAlive(self):
         if(self.sharedData['leader']['isSelf']):
