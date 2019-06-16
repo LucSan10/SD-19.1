@@ -50,12 +50,12 @@ class MemberCommunicationThread (threading.Thread):
             message = Message.parse(response)
             if(message.type == MessageType.JOIN_SWARM):
                 self.saveNewMemberToSwarm(address)
-                if(self.sharedData['isLeader']):
+                if(self.sharedData['leader']['isSelf']):
                     self.announcesLeadership(address)
                 continue
             if(message.type == MessageType.LEADER):
-                self.sharedData['isLeader'] = False
-                self.sharedData['leader'] = address
+                self.sharedData['leader']['isSelf'] = False
+                self.sharedData['leader']['address'] = address
                 print('Leader is ', address)
                 continue
 
@@ -68,7 +68,7 @@ class MemberCommunicationThread (threading.Thread):
     # if is first member, declares itself as leader
     def checkIfFirstMemberAndLeader(self):
         if(len(self.swarmMembers) == 0):
-            self.sharedData['isLeader'] = True
+            self.sharedData['leader']['isSelf'] = True
             print('is leader')
 
     def announcesLeadership(self, address):
