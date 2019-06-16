@@ -61,8 +61,8 @@ class MemberInterfaceThread (threading.Thread):
 
         self.sharedData['leader']['isAlive'] = False
         
-        self.socket.sendto(
-            Message(MessageType.ALIVE).toByteStr(),
+        self.socket.send(
+            MessageType.ALIVE,
             self.sharedData['leader']['address']
         )
 

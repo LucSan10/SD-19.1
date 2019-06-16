@@ -29,23 +29,21 @@ class MemberCommunicationThread (threading.Thread):
         self.checkIfFirstMemberAndLeader()
 
     def getSwarmMembers(self):
-        message = Message(MessageType.GET_MEMBERS)
-        self.socket.sendto(message.toByteStr(), self.orchestratorAddress)
-        response, address = self.socket.recvfrom(1024)
+        self.socket.send(MessageType.GET_MEMBERS, self.orchestratorAddress)
+        response, address = self.socket.receive()
         self.swarmMembers = json.loads(response)
     
     def enterSwarm(self):
-        message = Message(MessageType.JOIN_SWARM)
-        self.socket.sendto(message.toByteStr(), self.orchestratorAddress)
+        self.socket.send(MessageType.JOIN_SWARM, self.orchestratorAddress)
 
         for member in self.swarmMembers:
             print(tuple(member), flush=True)
-            self.socket.sendto(message.toByteStr(), tuple(member))
+            self.socket.send(MessageType.JOIN_SWARM, tuple(member))
     
     def listen(self):
         while True:
             print('listening to receive message', flush=True)
-            response, address = self.socket.recvfrom(1024)
+            response, address = self.socket.receive()
             message = Message.parse(response)
             if(message.type == MessageType.JOIN_SWARM):
                 self.saveNewMemberToSwarm(address)
@@ -58,8 +56,7 @@ class MemberCommunicationThread (threading.Thread):
                 print('Leader is ', address)
                 continue
             if(message.type == MessageType.ALIVE):
-                message = Message(MessageType.ALIVE_OK)
-                self.socket.sendto(message.toByteStr(), address)
+                self.socket.send(MessageType.ALIVE_OK, address)
                 continue
             if(message.type == MessageType.ALIVE_OK):
                 self.sharedData['leader']['isAlive'] = True
@@ -78,5 +75,4 @@ class MemberCommunicationThread (threading.Thread):
             print('is leader')
 
     def announcesLeadership(self, address):
-        message = Message(MessageType.LEADER)
-        self.socket.sendto(message.toByteStr(), address)
+        self.socket.send(MessageType.LEADER, address)
