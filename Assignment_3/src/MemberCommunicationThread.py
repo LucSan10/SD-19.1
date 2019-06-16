@@ -58,6 +58,13 @@ class MemberCommunicationThread (threading.Thread):
                 self.sharedData['leader']['address'] = address
                 print('Leader is ', address)
                 continue
+            if(message.type == MessageType.ALIVE):
+                message = Message(MessageType.ALIVE_OK)
+                self.socket.sendto(message.toByteStr(), address)
+                continue
+            if(message.type == MessageType.ALIVE_OK):
+                self.sharedData['leader']['isAlive'] = True
+                continue
 
             raise NotImplementedError(message.type)
 

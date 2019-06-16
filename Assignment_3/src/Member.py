@@ -17,7 +17,8 @@ class Member:
         sharedData = {
             "leader": {
                 "isSelf": False, # is this member the leader
-                "address": None # if isLeader false, stores the leader address
+                "address": None, # if isLeader false, stores the leader address
+                "isAlive": False, # whether the leader is alive or not
             }
         }
 
