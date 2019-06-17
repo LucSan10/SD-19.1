@@ -4,6 +4,9 @@ import os
 from src.Message import Message
 from src.Message import MessageType
 import json
+import time
+
+SECONDS_TO_WAIT_FOR_ALIVE_RESPONSE = 2
 
 class CommunicationThread (threading.Thread):
     socket = None
@@ -76,3 +79,25 @@ class CommunicationThread (threading.Thread):
 
     def announcesLeadership(self, address):
         self.socket.send(MessageType.LEADER, address)
+
+    def checkIfLeaderIsAlive(self):
+        print("Checking leader status...")
+        if(self.sharedData['leader']['isSelf']):
+            print("I'm the leader! I am alive!", flush=True)
+            return 1
+
+        self.sharedData['leader']['isAlive'] = False
+        
+        self.socket.send(
+            MessageType.ALIVE,
+            self.sharedData['leader']['address']
+        )
+
+        time.sleep(SECONDS_TO_WAIT_FOR_ALIVE_RESPONSE)
+
+        if(self.sharedData['leader']['isAlive'] == True):
+            print("Leader is alive!", flush=True)
+            return 1
+        else:
+            print("Leader is DEAD!", flush=True)
+            return 0

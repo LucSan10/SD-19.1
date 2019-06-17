@@ -35,12 +35,14 @@ class InterfaceThread (threading.Thread):
 
     socket = None
     sharedData = None
+    communicationThread = None
 
-    def __init__(self, socket, sharedData):
+    def __init__(self, socket, sharedData, communicationThread):
         threading.Thread.__init__(self)
         self.socket = socket
         self.sharedData = sharedData
-    
+        self.communicationThread = communicationThread
+
     def run(self):
         address = self.socket.getsockname()
         print('Starting interface (%s, %s) ' % (address[0], address[1]) , flush=True)
@@ -67,7 +69,7 @@ class InterfaceThread (threading.Thread):
         os._exit(0)
 
     def checkIfLeaderIsAlive(self):
-        checkIfLeaderIsAlive(self)
+        self.communicationThread.checkIfLeaderIsAlive()
 
     def failProcess(self):
         self.sharedData['failProcess'] = True
