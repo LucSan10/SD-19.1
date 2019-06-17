@@ -54,7 +54,7 @@ class CommunicationThread (threading.Thread):
             if(message.type == MessageType.JOIN_SWARM):
                 self.saveNewMemberToSwarm(address)
                 if(self.sharedData['leader']['isSelf']):
-                    self.announcesLeadership(address)
+                    self.announceLeadership(address)
                 continue
             if(message.type == MessageType.LEADER):
                 self.sharedData['leader']['isSelf'] = False
@@ -87,8 +87,13 @@ class CommunicationThread (threading.Thread):
             self.sharedData['leader']['isSelf'] = True
             print('is leader')
 
-    def announcesLeadership(self, address):
+    def announceLeadership(self, address):
         self.socket.send(MessageType.LEADER, address)
+
+    def broadcastLeadership(self):
+        for member in self.swarmMembers:
+            print("broadcasting leadership to (%s, %s)" % (member[0], member[1]), flush=True)
+            self.announceLeadership(tuple(member))
 
     def checkIfLeaderIsAlive(self):
         print("Checking leader status...")
@@ -128,6 +133,7 @@ class CommunicationThread (threading.Thread):
         time.sleep(SECONDS_TO_WAIT_FOR_OK_RESPONSES)
         if(self.isSelfLeaderElected):
             print("I'm the new leader!", flush=True)
+            self.broadcastLeadership()
         else:
             print("I'm NOT the new leader!", flush=True)
 
