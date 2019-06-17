@@ -1,12 +1,12 @@
 import threading
 from enum import Enum
+import os
 from src.Message import Message
 from src.Message import MessageType
 import json
 
 class CommunicationThread (threading.Thread):
     socket = None
-    swarmMembers = []
     orchestratorAddress = None
     sharedData = None
 
@@ -31,12 +31,12 @@ class CommunicationThread (threading.Thread):
         self.socket.send(MessageType.GET_MEMBERS, self.orchestratorAddress)
         response, address = self.socket.receive()
         message = Message.parse(response)
-        self.swarmMembers = json.loads(message.params[0])
+        self.sharedData["swarmMembers"] = json.loads(message.params[0])
     
     def enterSwarm(self):
         self.socket.send(MessageType.JOIN_SWARM, self.orchestratorAddress)
 
-        for member in self.swarmMembers:
+        for member in self.sharedData["swarmMembers"]:
             print(tuple(member), flush=True)
             self.socket.send(MessageType.JOIN_SWARM, tuple(member))
     
@@ -65,12 +65,12 @@ class CommunicationThread (threading.Thread):
             raise NotImplementedError(message.type)
 
     def saveNewMemberToSwarm(self, address):
-        self.swarmMembers.append(address)
+        self.sharedData["swarmMembers"].append(address)
         print('New member (%s, %s) joining swarm' % (address[0], address[1]) , flush=True)
     
     # if is first member, declares itself as leader
     def checkIfFirstMemberAndLeader(self):
-        if(len(self.swarmMembers) == 0):
+        if(len(self.sharedData["swarmMembers"]) == 0):
             self.sharedData['leader']['isSelf'] = True
             print('is leader')
 
