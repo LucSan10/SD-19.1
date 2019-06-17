@@ -1,5 +1,5 @@
 import threading
-import sys
+import os
 from enum import Enum
 from src.Message import Message
 from src.Message import MessageType
@@ -62,7 +62,7 @@ class MemberInterfaceThread (threading.Thread):
     def finishProcess(self):
         print('finishing', flush=True)
         self.socket.close()
-        sys.exit(1)
+        os._exit(0)
 
     def isLeaderIsAlive(self):
         if(self.sharedData['leader']['isSelf']):

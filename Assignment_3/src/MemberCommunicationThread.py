@@ -1,5 +1,4 @@
 import threading
-import sys
 from enum import Enum
 from src.Message import Message
 from src.Message import MessageType

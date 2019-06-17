@@ -1,7 +1,7 @@
 import socket
 from src.Message import *
 import json
-import sys
+import os
 
 BUFFERSIZE = 1024
 class Orchestrator:
@@ -27,7 +27,7 @@ class Orchestrator:
                 continue
             if(message.type == MessageType.KILL):
                 print('finishing', flush=True)
-                sys.exit(1)
+                os._exit(0)
 
             raise NotImplementedError(message.type)
 
