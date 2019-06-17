@@ -94,7 +94,7 @@ class CommunicationThread (threading.Thread):
         print("Checking leader status...")
         if(self.sharedData['leader']['isSelf']):
             print("I'm the leader! I am alive!", flush=True)
-            return 1
+            return
 
         self.sharedData['leader']['isAlive'] = False
         
@@ -107,10 +107,10 @@ class CommunicationThread (threading.Thread):
 
         if(self.sharedData['leader']['isAlive'] == True):
             print("Leader is alive!", flush=True)
-            return True
+            return
         else:
             print("Leader is DEAD!", flush=True)
-            return False
+            self.startElection()
 
     def startElection(self):
         self.isSelfLeaderElected = True

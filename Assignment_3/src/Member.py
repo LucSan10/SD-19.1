@@ -22,7 +22,6 @@ class Member:
             },
             "id": id, # process id
             "failProcess": False # whether the communication of the process blocked "failed member"
-            "swarmMembers": []
         }
 
         socket = SocketWrapper(sharedData)

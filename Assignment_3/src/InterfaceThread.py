@@ -68,8 +68,7 @@ class InterfaceThread (threading.Thread):
         os._exit(0)
 
     def checkIfLeaderIsAlive(self):
-        if(not self.communicationThread.checkIfLeaderIsAlive()):
-            self.communicationThread.startElection()
+        self.communicationThread.checkIfLeaderIsAlive()
 
     def failProcess(self):
         self.sharedData['failProcess'] = True
