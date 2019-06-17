@@ -15,7 +15,9 @@ class Member:
                 "address": None, # if isLeader false, stores the leader address
                 "isAlive": False, # whether the leader is alive or not
             },
-            "failProcess": False # whether the communication of the process blocked "failed member"
+            "id": os.getpid(), # process id
+            "failProcess": False, # whether the communication of the process blocked "failed member"
+            "swarmMembers": []
         }
 
         socket = SocketWrapper(sharedData)
