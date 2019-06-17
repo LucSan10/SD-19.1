@@ -4,7 +4,6 @@ from src.Message import Message
 from src.Message import MessageType
 import time
 import json
-from src.functions import checkIfLeaderIsAlive
 
 SECONDS_TO_WAIT_FOR_ALIVE_RESPONSE = 2
 
