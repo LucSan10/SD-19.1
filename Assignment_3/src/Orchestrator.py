@@ -1,5 +1,6 @@
 import socket
-from src.Message import *
+from src.Message import Message
+from src.Message import MessageType
 import json
 import os
 

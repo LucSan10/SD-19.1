@@ -1,4 +1,4 @@
-from src.Member import *
+from src.Member import Member
 
 import socket
 ORCHESTRATOR_ADDRESS = ("127.0.0.1", 2000)
