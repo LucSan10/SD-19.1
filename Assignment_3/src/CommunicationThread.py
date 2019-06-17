@@ -140,8 +140,8 @@ class CommunicationThread (threading.Thread):
         print(type(self.sharedData['id']))
         if(int(processId) < self.sharedData['id']):
             print('START ELECTION', flush=True)
-            self.socket.sendMessage(
+            self.socket.send(
                 MessageType.OK,
-                address,
+                address
             )
             self.startElection()
