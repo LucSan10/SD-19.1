@@ -58,7 +58,8 @@ class InterfaceThread (threading.Thread):
     def handleOption(self, choice):
         for option in self.OPTIONS:
             if(option["value"] == choice):
-                getattr(self, option['handler'])()
+                return getattr(self, option['handler'])()
+        print('Option not recognized!', flush=True)
     
     def finishProcess(self):
         print('finishing', flush=True)
