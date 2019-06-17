@@ -5,6 +5,7 @@ from src.Message import Message
 from src.Message import MessageType
 import json
 import time
+from src.functions import checkIfLeaderIsAlive 
 
 SECONDS_TO_WAIT_FOR_ALIVE_RESPONSE = 2
 
@@ -65,25 +66,7 @@ class InterfaceThread (threading.Thread):
         os._exit(0)
 
     def checkIfLeaderIsAlive(self):
-        print("Checking leader status...")
-
-        if(self.sharedData['leader']['isSelf']):
-            print("I'm the leader! I am alive!", flush=True)
-            return
-
-        self.sharedData['leader']['isAlive'] = False
-        
-        self.socket.send(
-            MessageType.ALIVE,
-            self.sharedData['leader']['address']
-        )
-
-        time.sleep(SECONDS_TO_WAIT_FOR_ALIVE_RESPONSE)
-
-        if(self.sharedData['leader']['isAlive'] == True):
-            print("Leader is alive!", flush=True)
-        else:
-            print("Leader is DEAD!", flush=True)
+        checkIfLeaderIsAlive(self)
 
     def failProcess(self):
         self.sharedData['failProcess'] = True
