@@ -17,8 +17,20 @@ class SocketWrapper ():
         self.sharedData = sharedData
 
     def send(self, messageType, address):
-        return self.socket.sendto(
+        return self.sendMessage(
             Message(messageType).toByteStr(),
+            address
+        )
+    
+    def sendMessage(self, message, address):
+        name = Message.parse(message).type.name
+        if (self.sharedData['failProcess']):
+            print("%s message sent blocked" % name, flush=True)
+            return
+
+        print("%s message sent" % name, flush=True)
+        return self.socket.sendto(
+            message,
             address
         )
 
@@ -27,8 +39,10 @@ class SocketWrapper ():
         message = Message.parse(response)
         if(self.sharedData['failProcess']):
             if(message.type != MessageType.LEADER):
+                print('%s message received ignored' % message.type.name, flush=True)
                 return self.receive()
 
+        print('%s message received' % message.type.name, flush=True)
         return (response, address)
     
     def getsockname(self):

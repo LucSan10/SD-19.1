@@ -6,6 +6,7 @@ import time
 import json
 
 SECONDS_TO_WAIT_FOR_ALIVE_RESPONSE = 2
+SECONDS_TO_WAIT_FOR_CHECK = 10
 
 class LeaderCheckingThread (threading.Thread):
     socket = None
@@ -22,5 +23,6 @@ class LeaderCheckingThread (threading.Thread):
         address = self.socket.getsockname()
         print('Starting checker (%s, %s) ' % (address[0], address[1]) , flush=True)
         while True:
-            time.sleep(5)
-            self.communicationThread.checkIfLeaderIsAlive()
+            time.sleep(SECONDS_TO_WAIT_FOR_CHECK)
+            if(not self.sharedData['failProcess']):
+                self.communicationThread.checkIfLeaderIsAlive()
