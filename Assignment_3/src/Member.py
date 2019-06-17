@@ -11,7 +11,7 @@ class Member:
     communcationThread = None
     leaderCheckingThread = None
 
-    def __init__(self, orchestratorAddress):
+    def __init__(self, trackerAddress):
         id = os.getpid()
         print('Process ID: ', id, flush=True)
         sharedData = {
@@ -31,7 +31,7 @@ class Member:
 
         socket = SocketWrapper(sharedData)
 
-        self.communicationThread = CommunicationThread(socket, orchestratorAddress, sharedData)
+        self.communicationThread = CommunicationThread(socket, trackerAddress, sharedData)
         self.interfaceThread = InterfaceThread(socket, sharedData, self.communicationThread)
         self.leaderCheckingThread = LeaderCheckingThread(socket, sharedData, self.communicationThread)
 

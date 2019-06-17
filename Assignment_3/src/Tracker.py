@@ -5,7 +5,7 @@ import json
 import os
 
 BUFFERSIZE = 1024
-class Orchestrator:
+class Tracker:
     members = []
     socket = None
 
@@ -16,7 +16,7 @@ class Orchestrator:
         self.initListening()
     
     def initListening(self):
-        print('orchestrator will start listening...', flush=True)
+        print('tracker will start listening...', flush=True)
         while True:
             response, address = self.socket.recvfrom(1024)
             message = Message.parse(response)

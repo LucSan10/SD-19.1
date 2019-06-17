@@ -12,13 +12,13 @@ SECONDS_TO_WAIT_FOR_OK_RESPONSES = 2
 
 class CommunicationThread (threading.Thread):
     socket = None
-    orchestratorAddress = None
+    trackerAddress = None
     sharedData = None
 
-    def __init__(self, socket, orchestratorAddress, sharedData):
+    def __init__(self, socket, trackerAddress, sharedData):
         threading.Thread.__init__(self)
         self.socket = socket
-        self.orchestratorAddress = orchestratorAddress
+        self.trackerAddress = trackerAddress
         self.sharedData = sharedData
     
     def run(self):
@@ -33,13 +33,13 @@ class CommunicationThread (threading.Thread):
         self.checkIfFirstMemberAndLeader()
 
     def getSwarmMembers(self):
-        self.socket.send(MessageType.GET_MEMBERS, self.orchestratorAddress)
+        self.socket.send(MessageType.GET_MEMBERS, self.trackerAddress)
         response, address = self.socket.receive()
         message = Message.parse(response)
         self.sharedData['swarmMembers'] = json.loads(message.params[0])
     
     def enterSwarm(self):
-        self.socket.send(MessageType.JOIN_SWARM, self.orchestratorAddress)
+        self.socket.send(MessageType.JOIN_SWARM, self.trackerAddress)
 
         for member in self.sharedData['swarmMembers']:
             print(tuple(member), flush=True)

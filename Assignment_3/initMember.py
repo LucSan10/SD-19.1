@@ -1,7 +1,7 @@
 from src.Member import Member
 
 import socket
-ORCHESTRATOR_ADDRESS = ("127.0.0.1", 2000)
+TRACKER_ADDRESS = ("127.0.0.1", 2000)
 
-member = Member(ORCHESTRATOR_ADDRESS)
+member = Member(TRACKER_ADDRESS)
 member.start()
