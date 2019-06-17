@@ -26,7 +26,7 @@ class SocketWrapper ():
         response, address = self.socket.recvfrom(BUFFERSIZE)
         message = Message.parse(response)
         if(self.sharedData['failProcess']):
-            if(message.type == MessageType.ALIVE):
+            if(message.type != MessageType.LEADER):
                 return self.receive()
 
         return (response, address)
