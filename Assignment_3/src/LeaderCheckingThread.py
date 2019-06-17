@@ -24,6 +24,7 @@ class LeaderCheckingThread (threading.Thread):
             self.checkIfLeaderIsAlive()        
 
     def checkIfLeaderIsAlive(self):
+        print("Checking leader status...")
         if(self.sharedData['leader']['isSelf']):
             print("I'm the leader! I am alive!", flush=True)
             return
