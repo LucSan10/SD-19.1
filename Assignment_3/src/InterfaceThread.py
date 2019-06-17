@@ -75,3 +75,4 @@ class InterfaceThread (threading.Thread):
 
     def recoverProcess(self):
         self.sharedData['failProcess'] = False
+        self.communicationThread.startElection()
