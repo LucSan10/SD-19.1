@@ -18,7 +18,7 @@ class SocketWrapper ():
 
     def send(self, messageType, address):
         return self.socket.sendto(
-            Message(messageType).toByteStr(),
+            Message(messageType, self.sharedData["id"]).toByteStr(),
             address
         )
 
