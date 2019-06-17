@@ -1,6 +1,6 @@
 import time
-from src.MemberInterfaceThread import MemberInterfaceThread
-from src.MemberCommunicationThread import MemberCommunicationThread
+from src.InterfaceThread import InterfaceThread
+from src.CommunicationThread import CommunicationThread
 from src.SocketWrapper import SocketWrapper
 import threading
 
@@ -20,8 +20,8 @@ class Member:
 
         socket = SocketWrapper(sharedData)
 
-        self.interfaceThread = MemberInterfaceThread(socket, sharedData)
-        self.communicationThread = MemberCommunicationThread(socket, orchestratorAddress, sharedData)
+        self.interfaceThread = InterfaceThread(socket, sharedData)
+        self.communicationThread = CommunicationThread(socket, orchestratorAddress, sharedData)
 
     def start(self):
         self.interfaceThread.start()

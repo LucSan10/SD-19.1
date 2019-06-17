@@ -4,7 +4,7 @@ from src.Message import Message
 from src.Message import MessageType
 import json
 
-class MemberCommunicationThread (threading.Thread):
+class CommunicationThread (threading.Thread):
     socket = None
     swarmMembers = []
     orchestratorAddress = None

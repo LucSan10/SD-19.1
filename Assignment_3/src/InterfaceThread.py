@@ -8,7 +8,7 @@ import time
 
 SECONDS_TO_WAIT_FOR_ALIVE_RESPONSE = 2
 
-class MemberInterfaceThread (threading.Thread):
+class InterfaceThread (threading.Thread):
     OPTIONS = [
         {
             "value": "1",
