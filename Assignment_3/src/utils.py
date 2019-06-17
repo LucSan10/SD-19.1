@@ -1,4 +1,4 @@
 def log(*message):
-    debugger = True
+    debugger = False
     if(debugger):
         print(*message, flush=True)
