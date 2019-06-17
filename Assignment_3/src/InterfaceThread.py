@@ -18,7 +18,7 @@ class InterfaceThread (threading.Thread):
         {
             "value": "2",
             "description": "check whether leader is alive",
-            "handler": "isLeaderIsAlive"
+            "handler": "checkIfLeaderIsAlive"
         },
         {
             "value": "3",
@@ -64,7 +64,7 @@ class InterfaceThread (threading.Thread):
         self.socket.close()
         os._exit(0)
 
-    def isLeaderIsAlive(self):
+    def checkIfLeaderIsAlive(self):
         if(self.sharedData['leader']['isSelf']):
             print("I'm the leader! I am alive!", flush=True)
             return
