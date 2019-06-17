@@ -13,6 +13,7 @@ class CommunicationThread (threading.Thread):
     socket = None
     orchestratorAddress = None
     sharedData = None
+    swarmMembers = []
     isSelfLeaderElected = None # used to check if any member answered OK on election
 
     def __init__(self, socket, orchestratorAddress, sharedData):
@@ -36,12 +37,12 @@ class CommunicationThread (threading.Thread):
         self.socket.send(MessageType.GET_MEMBERS, self.orchestratorAddress)
         response, address = self.socket.receive()
         message = Message.parse(response)
-        self.sharedData["swarmMembers"] = json.loads(message.params[0])
+        self.swarmMembers = json.loads(message.params[0])
     
     def enterSwarm(self):
         self.socket.send(MessageType.JOIN_SWARM, self.orchestratorAddress)
 
-        for member in self.sharedData["swarmMembers"]:
+        for member in self.swarmMembers:
             print(tuple(member), flush=True)
             self.socket.send(MessageType.JOIN_SWARM, tuple(member))
     
@@ -77,12 +78,12 @@ class CommunicationThread (threading.Thread):
             raise NotImplementedError(message.type)
 
     def saveNewMemberToSwarm(self, address):
-        self.sharedData["swarmMembers"].append(address)
+        self.swarmMembers.append(address)
         print('New member (%s, %s) joining swarm' % (address[0], address[1]) , flush=True)
     
     # if is first member, declares itself as leader
     def checkIfFirstMemberAndLeader(self):
-        if(len(self.sharedData["swarmMembers"]) == 0):
+        if(len(self.swarmMembers) == 0):
             self.sharedData['leader']['isSelf'] = True
             print('is leader')
 
@@ -114,7 +115,7 @@ class CommunicationThread (threading.Thread):
     def startElection(self):
         self.isSelfLeaderElected = True
         print("Starting election...", flush=True)
-        for member in self.sharedData['swarmMembers']:
+        for member in self.swarmMembers:
             message = Message(
                 MessageType.ELECTION,
                 str(self.sharedData['id'])
