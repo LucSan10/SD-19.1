@@ -1,4 +1,6 @@
 import time
+import os
+from src.LeaderCheckingThread import LeaderCheckingThread
 from src.InterfaceThread import InterfaceThread
 from src.CommunicationThread import CommunicationThread
 from src.SocketWrapper import SocketWrapper
@@ -7,6 +9,7 @@ import threading
 class Member:
     interfaceThread = None
     communcationThread = None
+    leaderCheckingThread = None
 
     def __init__(self, orchestratorAddress):
         sharedData = {
@@ -24,7 +27,9 @@ class Member:
 
         self.interfaceThread = InterfaceThread(socket, sharedData)
         self.communicationThread = CommunicationThread(socket, orchestratorAddress, sharedData)
+        self.leaderCheckingThread = LeaderCheckingThread(socket, sharedData)
 
     def start(self):
         self.interfaceThread.start()
+        self.leaderCheckingThread.start()
         self.communicationThread.start()
