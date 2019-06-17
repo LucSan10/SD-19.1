@@ -6,6 +6,7 @@ from src.Message import MessageType
 import json
 import time
 from src.ElectionThread import ElectionThread
+from src.utils import log
 
 SECONDS_TO_WAIT_FOR_ALIVE_RESPONSE = 2
 SECONDS_TO_WAIT_FOR_OK_RESPONSES = 2
@@ -23,7 +24,7 @@ class CommunicationThread (threading.Thread):
     
     def run(self):
         address = self.socket.getsockname()
-        print('Starting communication (%s, %s) ' % (address[0], address[1]) , flush=True)
+        log('Starting communication (%s, %s) ' % (address[0], address[1]) )
         self.joinSwarm()
         self.listen()
     
@@ -42,12 +43,12 @@ class CommunicationThread (threading.Thread):
         self.socket.send(MessageType.JOIN_SWARM, self.trackerAddress)
 
         for member in self.sharedData['swarmMembers']:
-            print(tuple(member), flush=True)
+            log(tuple(member))
             self.socket.send(MessageType.JOIN_SWARM, tuple(member))
     
     def listen(self):
         while True:
-            print('listening to receive message', flush=True)
+            log('listening to receive message')
             response, address = self.socket.receive()
             message = Message.parse(response)
             if(message.type == MessageType.JOIN_SWARM):
@@ -58,7 +59,7 @@ class CommunicationThread (threading.Thread):
             if(message.type == MessageType.LEADER):
                 self.sharedData['leader']['isSelf'] = False
                 self.sharedData['leader']['address'] = address
-                print('Leader is ', address)
+                log('Leader is ', address)
                 continue
             if(message.type == MessageType.ALIVE):
                 self.socket.send(MessageType.ALIVE_OK, address)
@@ -70,7 +71,7 @@ class CommunicationThread (threading.Thread):
                 self.handleElectionMessage(message, address)
                 continue
             if(message.type == MessageType.OK):
-                print('Received OK for election id ', message.params[1], flush=True)
+                log('Received OK for election id ', message.params[1])
                 self.sharedData['elections'][message.params[1]]['isLeader'] = False
                 continue
 
@@ -78,22 +79,22 @@ class CommunicationThread (threading.Thread):
 
     def saveNewMemberToSwarm(self, address):
         self.sharedData['swarmMembers'].append(address)
-        print('New member (%s, %s) joining swarm' % (address[0], address[1]) , flush=True)
+        log('New member (%s, %s) joining swarm' % (address[0], address[1]) )
     
     # if is first member, declares itself as leader
     def checkIfFirstMemberAndLeader(self):
         if(len(self.sharedData['swarmMembers']) == 0):
             self.sharedData['leader']['isSelf'] = True
-            print('is leader')
+            log('is leader')
 
     def announceLeadership(self, address):
         self.socket.send(MessageType.LEADER, address)
 
 
     def checkIfLeaderIsAlive(self):
-        print("Checking leader status...")
+        log("Checking leader status...")
         if(self.sharedData['leader']['isSelf']):
-            print("I'm the leader! I am alive!", flush=True)
+            log("I'm the leader! I am alive!")
             return
 
         self.sharedData['leader']['isAlive'] = False
@@ -106,16 +107,16 @@ class CommunicationThread (threading.Thread):
         time.sleep(SECONDS_TO_WAIT_FOR_ALIVE_RESPONSE)
 
         if(self.sharedData['leader']['isAlive'] == True):
-            print("Leader is alive!", flush=True)
+            log("Leader is alive!")
             return
         else:
-            print("Leader is DEAD!", flush=True)
+            log("Leader is DEAD!")
             self.startElection()
 
     def handleElectionMessage(self, message, address):
         processId = message.params[0]
         if(int(processId) < self.sharedData['id']):
-            print('sending OK for election ID ', message.params[1], flush=True)
+            log('sending OK for election ID ', message.params[1])
             message = Message(
                 MessageType.OK,
                 str(self.sharedData['id']),

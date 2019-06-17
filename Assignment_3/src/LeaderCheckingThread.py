@@ -4,6 +4,7 @@ from src.Message import Message
 from src.Message import MessageType
 import time
 import json
+from src.utils import log
 
 SECONDS_TO_WAIT_FOR_ALIVE_RESPONSE = 2
 SECONDS_TO_WAIT_FOR_CHECK = 10
@@ -21,7 +22,8 @@ class LeaderCheckingThread (threading.Thread):
 
     def run(self):
         address = self.socket.getsockname()
-        print('Starting checker (%s, %s) ' % (address[0], address[1]) , flush=True)
+        log('Starting checker (%s, %s) ' % (address[0], address[1]))
+        
         while True:
             time.sleep(SECONDS_TO_WAIT_FOR_CHECK)
             if(not self.sharedData['failProcess']):
