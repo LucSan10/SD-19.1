@@ -7,11 +7,13 @@ import json
 import time
 
 SECONDS_TO_WAIT_FOR_ALIVE_RESPONSE = 2
+SECONDS_TO_WAIT_FOR_OK_RESPONSES = 2
 
 class CommunicationThread (threading.Thread):
     socket = None
     orchestratorAddress = None
     sharedData = None
+    isSelfLeaderElected = None # used to check if any member answered OK on election
 
     def __init__(self, socket, orchestratorAddress, sharedData):
         threading.Thread.__init__(self)
@@ -64,6 +66,13 @@ class CommunicationThread (threading.Thread):
             if(message.type == MessageType.ALIVE_OK):
                 self.sharedData['leader']['isAlive'] = True
                 continue
+            if(message.type == MessageType.ELECTION):
+                self.handleElectionMessage(message, address)
+                continue
+            if(message.type == MessageType.OK):
+                print('Received OK', flush=True)
+                self.isSelfLeaderElected = False
+                continue
 
             raise NotImplementedError(message.type)
 
@@ -97,7 +106,41 @@ class CommunicationThread (threading.Thread):
 
         if(self.sharedData['leader']['isAlive'] == True):
             print("Leader is alive!", flush=True)
-            return 1
+            return True
         else:
             print("Leader is DEAD!", flush=True)
-            return 0
+            return False
+
+    def startElection(self):
+        self.isSelfLeaderElected = True
+        print("Starting election...", flush=True)
+        for member in self.sharedData['swarmMembers']:
+            message = Message(
+                MessageType.ELECTION,
+                str(self.sharedData['id'])
+            )
+            self.socket.sendMessage(
+                message.toByteStr(),
+                tuple(member),
+            )
+        
+        time.sleep(SECONDS_TO_WAIT_FOR_OK_RESPONSES)
+        if(self.isSelfLeaderElected):
+            print("I'm the new leader!", flush=True)
+        else:
+            print("I'm NOT the new leader!", flush=True)
+
+    def handleElectionMessage(self, message, address):
+        print('ELECTION', flush=True)
+        processId = message.params[0]
+        print(processId)
+        print(type(processId))
+        print(self.sharedData['id'])
+        print(type(self.sharedData['id']))
+        if(int(processId) < self.sharedData['id']):
+            print('START ELECTION', flush=True)
+            self.socket.sendMessage(
+                MessageType.OK,
+                address,
+            )
+            self.startElection()

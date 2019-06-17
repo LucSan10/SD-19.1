@@ -12,13 +12,15 @@ class Member:
     leaderCheckingThread = None
 
     def __init__(self, orchestratorAddress):
+        id = os.getpid()
+        print('Process ID: ', id, flush=True)
         sharedData = {
             "leader": {
                 "isSelf": False, # is this member the leader
                 "address": None, # if isLeader false, stores the leader address
                 "isAlive": False, # whether the leader is alive or not
             },
-            "id": os.getpid(), # process id
+            "id": id, # process id
             "failProcess": False, # whether the communication of the process blocked "failed member"
             "swarmMembers": []
         }

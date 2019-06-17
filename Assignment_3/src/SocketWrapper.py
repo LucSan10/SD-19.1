@@ -17,8 +17,14 @@ class SocketWrapper ():
         self.sharedData = sharedData
 
     def send(self, messageType, address):
-        return self.socket.sendto(
+        return self.sendMessage(
             Message(messageType).toByteStr(),
+            address
+        )
+    
+    def sendMessage(self, message, address):
+        return self.socket.sendto(
+            message,
             address
         )
 
@@ -27,6 +33,7 @@ class SocketWrapper ():
         message = Message.parse(response)
         if(self.sharedData['failProcess']):
             if(message.type != MessageType.LEADER):
+                print('MESSAGE BLOCKED', flush=True)
                 return self.receive()
 
         return (response, address)
