@@ -40,7 +40,6 @@ class Orchestrator:
         print('(%s, %s) getting members' % (address[0], address[1]) , flush=True)
         message = Message(
             MessageType.GET_MEMBERS,
-            os.getpid(),
             json.dumps(self.members)
         )
         self.socket.sendto(

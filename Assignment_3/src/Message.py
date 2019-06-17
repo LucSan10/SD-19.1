@@ -12,24 +12,21 @@ class MessageType(Enum):
 
 class Message:
     type = None
-    id = None
     params = None
 
-    def __init__(self, type, id, *params):
+    def __init__(self, type, *params):
         self.type = type
-        self.id = id
         self.params = params
     
     def __str__(self):
-        return str(self.type.value) + '|' + str(self.id) + '|' + '|'.join(self.params)
+        return str(self.type.value) + '|' + '|'.join(self.params)
     
     @staticmethod
     def parse(message):
-        text = message.decode('utf8').split('|')
+        text = message.decode('utf8').split('|')   
         return Message(
             MessageType(int(text[0])),
-            int(text[1]),
-            *text[2:]
+            *text[1:]
         )
 
     def toByteStr(self):
