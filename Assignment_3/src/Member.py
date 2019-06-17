@@ -21,7 +21,12 @@ class Member:
                 "isAlive": False, # whether the leader is alive or not
             },
             "id": id, # process id
-            "failProcess": False # whether the communication of the process blocked "failed member"
+            "failProcess": False, # whether the communication of the process blocked "failed member"
+            "elections": {
+                "exampleId": {
+                    "isLeader": True
+                }
+            }
         }
 
         socket = SocketWrapper(sharedData)
