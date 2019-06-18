@@ -57,7 +57,8 @@ class InterfaceThread (threading.Thread):
     
     def printMainMenu(self):
         print('==========================')
-        print('Options:')
+        print('Process ID: %s' % self.sharedData['id'])
+        print('\nOptions:')
         for option in self.OPTIONS:
             print(option["value"], ' - ', option['description'])
 
@@ -70,6 +71,13 @@ class InterfaceThread (threading.Thread):
     def finishProcess(self):
         print('finishing', flush=True)
         self.socket.close()
+        
+        filename = "process" + str(self.sharedData['id'])
+        file = open(filename + ".txt", "w+")
+        text = json.dumps(self.socket.statistics, indent=2)
+        file.write(text)
+        file.close()
+        
         os._exit(0)
 
     def checkIfLeaderIsAlive(self):
