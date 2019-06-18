@@ -33,8 +33,6 @@ class Tracker:
 
     def joinSwarm(self, address):
 
-        self.lock.acquire()
-
         print('(%s, %s) getting members' % (address[0], address[1]) , flush=True)
 
         message = Message(
@@ -45,7 +43,6 @@ class Tracker:
         print('New member (%s, %s) joining swarm' % (address[0], address[1]) , flush=True)
         
         self.members.append(address)
-        self.lock.release()
 
         self.socket.sendto(
             message.toByteStr(),
