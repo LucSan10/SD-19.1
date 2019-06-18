@@ -1,0 +1,22 @@
+{
+  "sent": {
+    "OK": 1291,
+    "ELECTION": 19395,
+    "LEADER": 16215,
+    "ALIVE": 12,
+    "ALIVE_OK": 26,
+    "JOIN_SWARM": 1,
+    "GET_MEMBERS": 1,
+    "KILL": 0
+  },
+  "received": {
+    "OK": 212,
+    "ELECTION": 1761,
+    "LEADER": 5968,
+    "ALIVE": 26,
+    "ALIVE_OK": 10,
+    "JOIN_SWARM": 14,
+    "GET_MEMBERS": 1,
+    "KILL": 0
+  }
+}
