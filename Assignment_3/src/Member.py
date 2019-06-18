@@ -27,7 +27,8 @@ class Member:
                 "exampleId": {
                     "isLeader": True
                 }
-            }
+            },
+            "statisticsLock" : threading.Lock()
         }
 
         socket = SocketWrapper(sharedData)
