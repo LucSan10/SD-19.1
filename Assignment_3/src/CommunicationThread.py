@@ -48,6 +48,9 @@ class CommunicationThread (threading.Thread):
         while True:
             log('listening to receive message')
             response, address = self.socket.receive()
+            if (response is None and address is None):
+                continue
+                
             message = Message.parse(response)
             if(message.type == MessageType.JOIN_SWARM):
                 self.saveNewMemberToSwarm(address)

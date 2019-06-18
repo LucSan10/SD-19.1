@@ -67,7 +67,7 @@ class SocketWrapper ():
         if(self.sharedData['failProcess']):
             if(message.type != MessageType.LEADER):
                 log('%s message received ignored' % message.type.name)
-                return self.receive()
+                return (None, None)
 
         self.storeStatistics(message.type, 'received')
 
