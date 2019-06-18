@@ -39,8 +39,6 @@ class CommunicationThread (threading.Thread):
         self.sharedData['swarmMembers'] = json.loads(message.params[0])
     
     def enterSwarm(self):
-        self.socket.send(MessageType.JOIN_SWARM, self.trackerAddress)
-
         for member in self.sharedData['swarmMembers']:
             print(tuple(member), flush=True)
             self.socket.send(MessageType.JOIN_SWARM, tuple(member))

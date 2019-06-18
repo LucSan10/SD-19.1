@@ -1,3 +1,4 @@
+import threading
 import socket
 from src.Message import Message
 from src.Message import MessageType
@@ -8,6 +9,7 @@ BUFFERSIZE = 1024
 class Tracker:
     members = []
     socket = None
+    lock = threading.Lock()
 
     def __init__(self, host, port):
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -20,11 +22,8 @@ class Tracker:
         while True:
             response, address = self.socket.recvfrom(1024)
             message = Message.parse(response)
-            if(message.type == MessageType.JOIN_SWARM):
-                self.joinSwarm(address)
-                continue
             if(message.type == MessageType.GET_MEMBERS):
-                self.getMembers(address)
+                self.joinSwarm(address)
                 continue
             if(message.type == MessageType.KILL):
                 print('finishing', flush=True)
@@ -33,15 +32,21 @@ class Tracker:
             raise NotImplementedError(message.type)
 
     def joinSwarm(self, address):
-        self.members.append(address)
-        print('New member (%s, %s) joining swarm' % (address[0], address[1]) , flush=True)
 
-    def getMembers(self, address):
+        self.lock.acquire()
+
         print('(%s, %s) getting members' % (address[0], address[1]) , flush=True)
+
         message = Message(
             MessageType.GET_MEMBERS,
             json.dumps(self.members)
         )
+
+        print('New member (%s, %s) joining swarm' % (address[0], address[1]) , flush=True)
+        
+        self.members.append(address)
+        self.lock.release()
+
         self.socket.sendto(
             message.toByteStr(),
             address
