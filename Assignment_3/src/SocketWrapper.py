@@ -75,7 +75,8 @@ class SocketWrapper ():
         return (response, address)
     
     def storeStatistics(self, messageType, direction):
-        self.statistics[direction][messageType.name] += 1
+        with self.sharedData['statisticsLock']:
+            self.statistics[direction][messageType.name] += 1
     
     def getsockname(self):
         return self.socket.getsockname()
