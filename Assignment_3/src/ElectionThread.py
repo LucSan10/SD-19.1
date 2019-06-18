@@ -5,6 +5,7 @@ from src.Message import Message
 from src.Message import MessageType
 import json
 import time
+from src.utils import log
 
 SECONDS_TO_WAIT_FOR_OK_RESPONSES = 2
 
@@ -21,9 +22,9 @@ class ElectionThread (threading.Thread):
         self.startElection()
     
     def startElection(self):
-        print("Starting election...", flush=True)
+        log("Starting election...")
         electionId = str(threading.get_ident())
-        print('ELECTION STARTED WITH ID ', electionId)
+        log('ELECTION STARTED WITH ID ', electionId)
         self.sharedData['elections'][electionId] = {
             "isLeader": True
         }
@@ -42,13 +43,13 @@ class ElectionThread (threading.Thread):
         time.sleep(SECONDS_TO_WAIT_FOR_OK_RESPONSES)
 
         if(self.sharedData['elections'][electionId]['isLeader']):
-            print("I'm the new leader!", flush=True)
+            log("I'm the new leader!")
             self.sharedData['leader']['isSelf'] = True
             self.broadcastLeadership()
         else:
-            print("I'm NOT the new leader!", flush=True)
+            log("I'm NOT the new leader!")
     
     def broadcastLeadership(self):
         for member in self.sharedData['swarmMembers']:
-            print("broadcasting leadership to (%s, %s)" % (member[0], member[1]), flush=True)
+            log("broadcasting leadership to (%s, %s)" % (member[0], member[1]))
             self.socket.send(MessageType.LEADER, tuple(member))

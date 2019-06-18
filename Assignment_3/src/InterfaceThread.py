@@ -29,6 +29,11 @@ class InterfaceThread (threading.Thread):
             "value": "4",
             "description": "recover process",
             "handler": "recoverProcess"
+        },
+        {
+            "value": "5",
+            "description": "print statistics",
+            "handler": "printStatistics"
         }
     ]
 
@@ -75,3 +80,6 @@ class InterfaceThread (threading.Thread):
 
     def recoverProcess(self):
         self.sharedData['failProcess'] = False
+
+    def printStatistics(self):
+        print(json.dumps(self.socket.statistics, indent=2), flush=True)

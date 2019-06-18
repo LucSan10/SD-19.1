@@ -2,6 +2,7 @@ from src.Message import Message
 from src.Message import MessageType
 import socket
 import json
+from src.utils import log
 
 HOST = '127.0.0.1'  # Standard loopback interface address (localhost)
 PORT = 0 # PORT 0 will make the system automatically assign a port to it
@@ -10,6 +11,28 @@ BUFFERSIZE = 1024
 class SocketWrapper ():
     socket = None
     sharedData = None
+    statistics = {
+        "sent" : {
+            "OK": 0,
+            "ELECTION": 0,
+            "LEADER": 0,
+            "ALIVE": 0,
+            "ALIVE_OK": 0,
+            "JOIN_SWARM": 0,
+            "GET_MEMBERS": 0,
+            "KILL": 0
+        },
+        "received" : {
+            "OK": 0,
+            "ELECTION": 0,
+            "LEADER": 0,
+            "ALIVE": 0,
+            "ALIVE_OK": 0,
+            "JOIN_SWARM": 0,
+            "GET_MEMBERS": 0,
+            "KILL": 0
+        }
+    }
 
     def __init__(self, sharedData):
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -23,12 +46,16 @@ class SocketWrapper ():
         )
     
     def sendMessage(self, message, address):
-        name = Message.parse(message).type.name
+        messageParsed = Message.parse(message)
+        name = messageParsed.type.name
         if (self.sharedData['failProcess']):
-            print("%s message sent blocked" % name, flush=True)
+            log("%s message sent blocked" % name)
             return
 
-        print("%s message sent" % name, flush=True)
+        log("%s message sent" % name)
+
+        self.storeStatistics(messageParsed.type, 'sent')
+
         return self.socket.sendto(
             message,
             address
@@ -39,11 +66,16 @@ class SocketWrapper ():
         message = Message.parse(response)
         if(self.sharedData['failProcess']):
             if(message.type != MessageType.LEADER):
-                print('%s message received ignored' % message.type.name, flush=True)
+                log('%s message received ignored' % message.type.name)
                 return self.receive()
 
-        print('%s message received' % message.type.name, flush=True)
+        self.storeStatistics(message.type, 'received')
+
+        log('%s message received' % message.type.name)
         return (response, address)
+    
+    def storeStatistics(self, messageType, direction):
+        self.statistics[direction][messageType.name] += 1
     
     def getsockname(self):
         return self.socket.getsockname()

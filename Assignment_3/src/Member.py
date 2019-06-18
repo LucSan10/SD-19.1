@@ -5,6 +5,7 @@ from src.InterfaceThread import InterfaceThread
 from src.CommunicationThread import CommunicationThread
 from src.SocketWrapper import SocketWrapper
 import threading
+from src.utils import log
 
 class Member:
     interfaceThread = None
@@ -13,7 +14,7 @@ class Member:
 
     def __init__(self, trackerAddress):
         id = os.getpid()
-        print('Process ID: ', id, flush=True)
+        log('Process ID: ', id)
         sharedData = {
             "leader": {
                 "isSelf": False, # is this member the leader
